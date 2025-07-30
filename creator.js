@@ -301,12 +301,18 @@ function showResult(galaxyLink, shareLink, galaxyId) {
     const galaxyLinkInput = document.getElementById('galaxyLink');
     const qrCodeContainer = document.getElementById('qrCode');
     
-    galaxyLinkInput.value = galaxyLink;
+    if (galaxyLinkInput) {
+        galaxyLinkInput.value = galaxyLink;
+    }
     
     // Generate QR code using the main galaxy link
-    generateQRCode(galaxyLink, qrCodeContainer);
+    if (qrCodeContainer) {
+        generateQRCode(galaxyLink, qrCodeContainer);
+    }
     
-    resultContainer.style.display = 'block';
+    if (resultContainer) {
+        resultContainer.style.display = 'block';
+    }
     
     // Smooth scroll to result
     setTimeout(() => {
@@ -415,19 +421,32 @@ function autoSave() {
 function loadAutoSave() {
     const draft = localStorage.getItem('deargift_draft');
     if (draft) {
-        const data = JSON.parse(draft);
-        
-        document.getElementById('messages').value = data.messages || '';
-        document.getElementById('messageColor').value = data.color || '#ff6b9d';
-        document.getElementById('colorHex').value = data.color || '#ff6b9d';
-        document.getElementById('colorPreview').style.backgroundColor = data.color || '#ff6b9d';
-        document.getElementById('heartText').value = data.heartText || '';
-        document.getElementById('enableHeart').checked = data.enableHeart !== false;
-        document.getElementById('hideFooter').checked = data.hideFooter || false;
-        
-        if (data.icons) {
-            iconsArray = data.icons;
-            updateIconsDisplay();
+        try {
+            const data = JSON.parse(draft);
+            
+            // Kiểm tra elements tồn tại trước khi set value
+            const messagesEl = document.getElementById('messages');
+            const colorEl = document.getElementById('messageColor');
+            const colorHexEl = document.getElementById('colorHex');
+            const colorPreviewEl = document.getElementById('colorPreview');
+            const heartTextEl = document.getElementById('heartText');
+            const enableHeartEl = document.getElementById('enableHeart');
+            const hideFooterEl = document.getElementById('hideFooter');
+            
+            if (messagesEl) messagesEl.value = data.messages || '';
+            if (colorEl) colorEl.value = data.color || '#ff6b9d';
+            if (colorHexEl) colorHexEl.value = data.color || '#ff6b9d';
+            if (colorPreviewEl) colorPreviewEl.style.backgroundColor = data.color || '#ff6b9d';
+            if (heartTextEl) heartTextEl.value = data.heartText || '';
+            if (enableHeartEl) enableHeartEl.checked = data.enableHeart !== false;
+            if (hideFooterEl) hideFooterEl.checked = data.hideFooter || false;
+            
+            if (data.icons) {
+                iconsArray = data.icons;
+                updateIconsDisplay();
+            }
+        } catch (error) {
+            console.warn('Error loading auto-save:', error);
         }
     }
 }
