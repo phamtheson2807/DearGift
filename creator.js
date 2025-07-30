@@ -221,10 +221,12 @@ async function handleFormSubmit(e) {
 
   const loading = document.getElementById("loading");
   const resultContainer = document.getElementById("resultContainer");
+  const submitBtn = document.querySelector("#galaxyForm button[type='submit']");
 
-  // Show loading
+  // Show loading and disable submit
   loading.style.display = "block";
   resultContainer.style.display = "none";
+  if (submitBtn) submitBtn.disabled = true;
 
   try {
     // Get form data
@@ -282,8 +284,14 @@ async function handleFormSubmit(e) {
     showResult(galaxyLink, shareLink, galaxyId);
   } catch (error) {
     alert("Có lỗi xảy ra: " + error.message);
+    if (error && error.stack) {
+      console.error("Chi tiết lỗi Firestore:", error.stack);
+    } else {
+      console.error("Chi tiết lỗi Firestore:", error);
+    }
   } finally {
     loading.style.display = "none";
+    if (submitBtn) submitBtn.disabled = false;
   }
 }
 
