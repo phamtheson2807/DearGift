@@ -215,8 +215,14 @@ async function handleFormSubmit(e) {
         
         // Generate links
         const baseUrl = window.location.origin + window.location.pathname.replace('creator.html', '');
-        const galaxyLink = `${baseUrl}index.html?id=${galaxyId}`;
-        const shareLink = `${baseUrl}index.html?id=${galaxyId}`;
+        // Nếu đang ở localhost, thay thế bằng production URL
+        let productionBaseUrl = baseUrl;
+        if (baseUrl.includes('localhost') || baseUrl.includes('127.0.0.1') || baseUrl.includes('file://')) {
+            productionBaseUrl = 'https://deargiftt.netlify.app/';
+        }
+        
+        const galaxyLink = `${productionBaseUrl}index.html?id=${galaxyId}`;
+        const shareLink = `${productionBaseUrl}index.html?id=${galaxyId}`;
         
         // Show result
         showResult(galaxyLink, shareLink, galaxyId);
