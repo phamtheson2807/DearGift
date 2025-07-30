@@ -108,24 +108,44 @@ async function loadGalaxyData() {
             return;
         }
         
-        console.log('Galaxy not found in localStorage, trying API...');
-        
-        // If not found locally, try to fetch from API
-        const response = await fetch(`https://dearlove-backend.onrender.com/api/galaxies/${galaxyId}`);
-        if (!response.ok) { 
-            console.error('API response not OK:', response.status, response.statusText);
-            showError(); 
-            return; 
+        console.log('Galaxy not found in localStorage, trying Firestore...');
+        try {
+            // Khởi tạo Firebase nếu chưa có
+            if (typeof firebase === 'undefined') {
+                const script = document.createElement('script');
+                script.src = 'https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js';
+                document.head.appendChild(script);
+                await new Promise(resolve => { script.onload = resolve; });
+                const script2 = document.createElement('script');
+                script2.src = 'https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js';
+                document.head.appendChild(script2);
+                await new Promise(resolve => { script2.onload = resolve; });
+            }
+            if (!firebase.apps.length) {
+                firebase.initializeApp({
+                    apiKey: "AIzaSyDsQzklj9EplxSPFltI3kRVjzIu8DILwko",
+                    authDomain: "deargift-f780b.firebaseapp.com",
+                    projectId: "deargift-f780b",
+                    storageBucket: "deargift-f780b.appspot.com",
+                    messagingSenderId: "329430119253",
+                    appId: "1:329430119253:web:71a099c215370092eeb5dc",
+                    measurementId: "G-NSJHP66HKW"
+                });
+            }
+            const db = firebase.firestore();
+            const doc = await db.collection('galaxies').doc(galaxyId).get();
+            if (!doc.exists) {
+                console.error('Galaxy not found in Firestore');
+                showError();
+                return;
+            }
+            galaxyData = doc.data();
+            console.log('Galaxy data loaded successfully from Firestore');
+            showStartButton();
+        } catch (error) {
+            console.error('Error loading galaxy from Firestore:', error);
+            showError();
         }
-        const data = await response.json();
-        if (!data || !data.data) { 
-            console.error('Invalid data received from API');
-            showError(); 
-            return; 
-        }
-        galaxyData = data.data;
-        console.log('Galaxy data loaded successfully from API');
-        showStartButton();
     } catch (error) {
         console.error('Error loading galaxy:', error);
         showError();

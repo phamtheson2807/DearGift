@@ -1,3 +1,18 @@
+// --- Firebase Firestore ---
+// Thêm đoạn này vào đầu file (sau các biến global)
+// Firebase SDK đã được thêm vào HTML
+const firebaseConfig = {
+  apiKey: "AIzaSyDsQzklj9EplxSPFltI3kRVjzIu8DILwko",
+  authDomain: "deargift-f780b.firebaseapp.com",
+  projectId: "deargift-f780b",
+  storageBucket: "deargift-f780b.appspot.com",
+  messagingSenderId: "329430119253",
+  appId: "1:329430119253:web:71a099c215370092eeb5dc",
+  measurementId: "G-NSJHP66HKW"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
 // Initialize stars background
 function createStars() {
     const starsContainer = document.getElementById('stars');
@@ -322,41 +337,29 @@ async function saveGalaxyData(id, data) {
     const existingData = JSON.parse(localStorage.getItem('deargift_galaxies') || '{}');
     existingData[id] = data;
     localStorage.setItem('deargift_galaxies', JSON.stringify(existingData));
-    
+
     // Debug log
     console.log('Galaxy saved with ID:', id);
     console.log('Galaxy data:', data);
-    
-    // Try to save to backend API for cross-device access
+
+    // Lưu lên Firestore (đảm bảo luôn lưu, không chỉ thử/catch)
     try {
-        const response = await fetch('https://dearlove-backend.onrender.com/api/galaxies', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                id: id,
-                data: data
-            })
-        });
-        
-        if (response.ok) {
-            console.log('Galaxy successfully saved to backend');
-        } else {
-            console.warn('Failed to save to backend, but localStorage backup available');
-        }
+        await db.collection('galaxies').doc(id).set(data);
+        console.log('Galaxy saved to Firestore:', id);
     } catch (error) {
-        console.warn('Backend save failed, but localStorage backup available:', error);
+        // Nếu lỗi Firestore, vẫn cho phép local dùng được, nhưng cảnh báo rõ ràng
+        alert('Lưu lên server thất bại, chỉ lưu tạm trên máy bạn. Vui lòng thử lại hoặc kiểm tra kết nối mạng!');
+        console.error('Error saving to Firestore:', error);
     }
-    
-    // Also save metadata for listing
+
+    // Also save metadata for listing (local)
     const metadata = {
         id,
         title: data.messages[0] || 'Untitled Galaxy',
         createdAt: data.createdAt,
         viewCount: 0
     };
-    
+
     const existingMeta = JSON.parse(localStorage.getItem('deargift_meta') || '[]');
     existingMeta.push(metadata);
     localStorage.setItem('deargift_meta', JSON.stringify(existingMeta));
