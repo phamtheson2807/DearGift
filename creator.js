@@ -216,7 +216,11 @@ async function handleFormSubmit(e) {
         // Generate links
         const baseUrl = window.location.origin + window.location.pathname.replace('creator.html', '');
         const galaxyLink = `${baseUrl}index.html?id=${galaxyId}`;
+<<<<<<< HEAD
         const shareLink = `${baseUrl}index.html?id=${galaxyId}`;
+=======
+        const shareLink = `${baseUrl}share.html?id=${galaxyId}`;
+>>>>>>> f3e5d8181866b80a98339830a569468a6a80dfef
         
         // Show result
         showResult(galaxyLink, shareLink, galaxyId);
@@ -299,12 +303,23 @@ function saveGalaxyData(id, data) {
 function showResult(galaxyLink, shareLink, galaxyId) {
     const resultContainer = document.getElementById('resultContainer');
     const galaxyLinkInput = document.getElementById('galaxyLink');
+<<<<<<< HEAD
     const qrCodeContainer = document.getElementById('qrCode');
     
     galaxyLinkInput.value = galaxyLink;
     
     // Generate QR code using the main galaxy link
     generateQRCode(galaxyLink, qrCodeContainer);
+=======
+    const shareLinkInput = document.getElementById('shareLink');
+    const qrCodeContainer = document.getElementById('qrCode');
+    
+    galaxyLinkInput.value = galaxyLink;
+    shareLinkInput.value = shareLink;
+    
+    // Generate QR code
+    generateQRCode(shareLink, qrCodeContainer);
+>>>>>>> f3e5d8181866b80a98339830a569468a6a80dfef
     
     resultContainer.style.display = 'block';
     
@@ -335,6 +350,18 @@ function copyLink() {
     });
 }
 
+<<<<<<< HEAD
+=======
+function copyShareLink() {
+    const linkInput = document.getElementById('shareLink');
+    linkInput.select();
+    linkInput.setSelectionRange(0, 99999);
+    navigator.clipboard.writeText(linkInput.value).then(() => {
+        showToast('✅ Đã sao chép link chia sẻ!');
+    });
+}
+
+>>>>>>> f3e5d8181866b80a98339830a569468a6a80dfef
 // Preview galaxy
 function previewGalaxy() {
     const link = document.getElementById('galaxyLink').value;

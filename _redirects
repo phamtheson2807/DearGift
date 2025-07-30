@@ -6,8 +6,13 @@
 # Handle galaxy viewer routes
 /galaxy/*  /index.html  200
 
+<<<<<<< HEAD
 # Handle share routes - redirect to main viewer  
 /share/*  /index.html  200
+=======
+# Handle share routes  
+/share/*  /share.html  200
+>>>>>>> f3e5d8181866b80a98339830a569468a6a80dfef
 
 # SPA fallback
 /*  /home.html  200
