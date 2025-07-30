@@ -1,0 +1,13 @@
+# Netlify redirects file
+
+# Redirect root to home page
+/  /home.html  200
+
+# Handle galaxy viewer routes
+/galaxy/*  /index.html  200
+
+# Handle share routes  
+/share/*  /share.html  200
+
+# SPA fallback
+/*  /home.html  200

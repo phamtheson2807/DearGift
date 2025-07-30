@@ -1,0 +1,25 @@
+{
+  "name": "deargift-galaxy",
+  "version": "1.0.0",
+  "description": "DearGift - Chia sẻ yêu thương qua Galaxy tin nhắn tuyệt đẹp",
+  "main": "home.html",
+  "scripts": {
+    "start": "python -m http.server 8000",
+    "dev": "python -m http.server 3000"
+  },
+  "keywords": [
+    "galaxy",
+    "messages",
+    "love",
+    "3d",
+    "animation",
+    "vietnamese"
+  ],
+  "author": "DearGift Team",
+  "license": "MIT",
+  "homepage": "https://deargift.netlify.app",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/deargift-galaxy.git"
+  }
+}
