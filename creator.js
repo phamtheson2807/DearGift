@@ -364,21 +364,38 @@ async function saveGalaxyData(id, data) {
 
 // Show result
 function showResult(galaxyLink, shareLink, galaxyId) {
+    console.log('=== DEBUG showResult ===');
+    console.log('galaxyLink:', galaxyLink);
+    console.log('shareLink:', shareLink);
+    console.log('galaxyId:', galaxyId);
+    
     const resultContainer = document.getElementById('resultContainer');
     const galaxyLinkInput = document.getElementById('galaxyLink');
     const qrCodeContainer = document.getElementById('qrCode');
     
+    console.log('resultContainer:', resultContainer);
+    console.log('galaxyLinkInput:', galaxyLinkInput);
+    console.log('qrCodeContainer:', qrCodeContainer);
+    
     // Kiểm tra và set galaxy link trước
     if (galaxyLinkInput && galaxyLink) {
         galaxyLinkInput.value = galaxyLink;
+        console.log('Galaxy link set to input:', galaxyLinkInput.value);
     }
     
     // Chỉ tạo QR code khi có link hợp lệ và container tồn tại
     if (qrCodeContainer && galaxyLink && galaxyLink.trim()) {
+        console.log('About to generate QR code with URL:', galaxyLink);
         // Thêm delay nhỏ để đảm bảo DOM đã sẵn sàng
         setTimeout(() => {
             generateQRCode(galaxyLink, qrCodeContainer);
         }, 100);
+    } else {
+        console.error('QR code generation skipped:', {
+            qrCodeContainer: !!qrCodeContainer,
+            galaxyLink: galaxyLink,
+            galaxyLinkTrimmed: galaxyLink ? galaxyLink.trim() : 'null'
+        });
     }
     
     if (resultContainer) {
@@ -393,8 +410,14 @@ function showResult(galaxyLink, shareLink, galaxyId) {
 
 // Generate QR code
 function generateQRCode(url, container) {
+    console.log('=== DEBUG generateQRCode ===');
+    console.log('Input URL:', url);
+    console.log('URL type:', typeof url);
+    console.log('URL length:', url ? url.length : 'null');
+    
     // Kiểm tra URL hợp lệ trước khi tạo QR
     if (!url || !url.trim()) {
+        console.error('URL is empty or null');
         container.innerHTML = `
             <div style="padding: 20px; background: rgba(255,255,255,0.1); border-radius: 10px; text-align: center;">
                 <p style="margin: 0; color: #ff6b9d;">⚠️ Không thể tạo QR Code</p>
@@ -407,14 +430,16 @@ function generateQRCode(url, container) {
     // Kiểm tra format URL
     try {
         const testUrl = new URL(url);
+        console.log('URL parsed successfully:', testUrl.href);
         if (!testUrl.protocol.startsWith('http')) {
-            throw new Error('Invalid protocol');
+            throw new Error('Invalid protocol: ' + testUrl.protocol);
         }
     } catch (error) {
+        console.error('URL parsing failed:', error);
         container.innerHTML = `
             <div style="padding: 20px; background: rgba(255,255,255,0.1); border-radius: 10px; text-align: center;">
                 <p style="margin: 0; color: #ff6b9d;">⚠️ Không thể tạo QR Code</p>
-                <p style="margin: 5px 0 0 0; font-size: 12px; opacity: 0.8;">Link không hợp lệ</p>
+                <p style="margin: 5px 0 0 0; font-size: 12px; opacity: 0.8;">Link không hợp lệ: ${error.message}</p>
             </div>
         `;
         return;
@@ -422,6 +447,7 @@ function generateQRCode(url, container) {
 
     // Tạo QR code với URL đã được validate
     const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(url)}`;
+    console.log('QR API URL:', qrUrl);
     
     container.innerHTML = `
         <h4 style="margin-bottom: 15px; color: #4ecdc4;">📱 QR Code để chia sẻ</h4>
@@ -434,6 +460,9 @@ function generateQRCode(url, container) {
             <p style="margin: 5px 0 0 0; font-size: 12px; opacity: 0.8;">Vui lòng copy link để chia sẻ</p>
         </div>
         <p style="margin-top: 10px; font-size: 12px; opacity: 0.8;">Quét mã QR để mở trên điện thoại</p>
+        <div style="margin-top: 10px; padding: 10px; background: rgba(0,0,0,0.2); border-radius: 5px; font-size: 10px; word-break: break-all;">
+            <strong>Debug URL:</strong> ${url}
+        </div>
     `;
 }
 
