@@ -248,9 +248,7 @@ async function handleFormSubmit(e) {
             productionBaseUrl = 'https://deargiftt.netlify.app/';
         } else {
             // Nếu đang ở production, dùng URL hiện tại
-            const currentPath = window.location.pathname;
-            const basePath = currentPath.replace('/creator.html', '/');
-            productionBaseUrl = window.location.origin + basePath;
+            productionBaseUrl = window.location.origin + '/';
         }
         
         const galaxyLink = `${productionBaseUrl}index.html?id=${galaxyId}`;
