@@ -1,0 +1,275 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0, minimum-scale=1.0">
+    <title>DearGift - Galaxy Viewer</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Dancing+Script:wght@700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="galaxy-viewer.css">
+
+    <!-- Open Graph for Social Sharing -->
+    <meta property="og:title" content="💕 Tin Nhắn Dành Cho Bạn - DearGift">
+    <meta property="og:description"
+        content="bạn là người rất đặc biệt khi được nhận tin này đấy :>. Chúc bạn luôn hạnh phúc nhé!">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="">
+    <meta property="og:site_name" content="DearGift">
+    <meta property="og:locale" content="vi_VN">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="./logo.png">
+
+    <!-- Inline CSS for Help Button, Dialog, and Start Button -->
+    <style>
+        /* Help Button */
+
+
+        /* Help Dialog */
+        .help-dialog {
+            display: block;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.85);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            z-index: 1002;
+            max-width: 90%;
+            width: 400px;
+            font-family: 'Orbitron', sans-serif;
+            box-shadow: 0 0 30px rgba(255, 107, 157, 0.5);
+            animation: dialogFadeIn 0.5s ease;
+
+        }
+
+        .help-dialog.active {
+            display: block;
+        }
+
+        .help-dialog.hide {
+            display: none !important;
+        }
+
+        .help-dialog h2 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #ff6b9d;
+            text-align: center;
+        }
+
+        .help-dialog p {
+            font-size: 1rem;
+            line-height: 1.5;
+            margin-bottom: 1rem;
+        }
+
+        .help-dialog .start-button {
+            position: absolute;
+            top: 10px;
+            right: 17px;
+            background: transparent;
+            border: none;
+            color: rgb(220, 69, 187);
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        @keyframes dialogFadeIn {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -40%);
+            }
+
+            to {
+                opacity: 1;
+                transform: translate(-50%, -50%);
+            }
+        }
+
+
+        /* Loading Screen Fade Out */
+        .loading-screen.fade-out {
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        /* Pulse Animation for Start Button */
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .help-dialog.fade-out {
+            opacity: 0;
+            transition: opacity 0.4s;
+        }
+
+        .help-dialog.hide {
+            display: none !important;
+        }
+
+        /* Responsive */
+        @media (max-width: 760px) {
+            .help-button {
+                width: 30px;
+                height: 30px;
+                font-size: 20px;
+
+            }
+
+            .help-dialog {
+                width: 90%;
+                padding: 15px;
+            }
+
+            .help-dialog h2 {
+                font-size: 1.2rem;
+            }
+
+            .help-dialog p {
+                font-size: 0.9rem;
+            }
+
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- DEMO MODE BANNER -->
+    <div id="demoModeBanner" style="
+        display: none;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 9999;
+        color: #fff;
+        font-size: 2.1rem;
+        font-family: 'Orbitron', sans-serif;
+        opacity: 0.28;
+        pointer-events: none;
+        text-align: center;
+        letter-spacing: 2px;
+        user-select: none;
+    ">Chế độ xem DEMO</div>
+
+    <!-- Loading -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loading-spinner"></div>
+        <h2>Những điều tốt đẹp đều cần thời gian...</h2>
+        <p>Vui lòng đợi trong giây lát</p>
+    </div>
+
+
+    <!-- Error -->
+    <div class="error-screen" id="errorScreen">
+        <div class="error-icon">😢</div>
+        <h2>Không tìm thấy website</h2>
+        <p>Link này có thể đã hết hạn hoặc không tồn tại.</p>
+        <div style="margin: 20px 0;">
+            <p>Bạn có thể thử:</p>
+            <a href="index.html?demo=1" class="back-home" style="margin: 5px; display: inline-block;">🎨 Xem phiên bản Demo</a>
+            <a href="index.html" class="back-home" style="margin: 5px; display: inline-block;">🏠 Về trang chủ</a>
+        </div>
+    </div>
+    <!-- Galaxy -->
+    <div class="galaxy-container" id="galaxy"></div>
+    <!-- Heart -->
+    <div class="heart-container" id="heartContainer">
+        <canvas id="pinkboard"></canvas>
+        <div class="heart-text" id="heartText"></div>
+    </div>
+    <!-- Audio -->
+    <audio id="galaxyAudio" controls style="display:none"></audio>
+
+    <!-- Help Button -->
+
+    <!-- Help Dialog -->
+    <div class="help-dialog" id="helpDialog">
+        <button class="start-button" id="startButton">✖</button>
+        <h2>Hướng Dẫn</h2>
+        <p>Chào bạn! Đây là cách sử dụng:</p>
+        <p> ✨ Kéo/nghiêng để xoay dải ngân hà.<br>
+            ✨ Chạm hai ngón để phóng to/thu nhỏ.<br>
+            ✨ Nhấn đúp để mở hiệu ứng trái tim.<br>
+            ✨ Ấn giữ màn hình để chữ chuyển động chậm lại.<br>
+    </div>
+      <script src="./detect-devtools.js"></script>
+  <script type='text/javascript'>
+        // Bypass for developers
+        const keyName = 'key';
+        const keyValue = '9ac7ec230e0e4513578f309d6d3579ad';
+
+        // Handle via config
+        DisableDevtool({
+            tkName: keyName,
+            md5: keyValue,
+            interval: '100',
+        });
+    </script>
+
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-GTY3RQNXTE"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'G-GTY3RQNXTE');
+
+        // Track message view
+        gtag('event', 'message_view', {
+            event_category: 'engagement',
+            event_label: 'galaxy_message'
+        });
+    </script>
+
+
+    <script>
+    // Check URL parameters for Galaxy ID or Demo mode
+    (function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const galaxyId = urlParams.get('id');
+        const isDemo = urlParams.get('demo');
+
+        // If no galaxy parameters, redirect to home page
+        if (!galaxyId && !isDemo) {
+            window.location.href = 'home.html';
+            return;
+        }
+
+        // If has parameters, continue loading galaxy viewer
+        console.log('Loading galaxy viewer with:', { galaxyId, isDemo });
+    })();
+
+    // Show demo banner if in demo mode
+    (function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('demo') === '1') {
+            const banner = document.getElementById('demoModeBanner');
+            if (banner) banner.style.display = 'block';
+        }
+    })();
+    </script>
+
+    <script type="module" src="galaxy-viewer.js"></script>
+
+</body>
+
+</html>
