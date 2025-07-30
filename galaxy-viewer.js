@@ -13,7 +13,7 @@ const demoGalaxyDataDefault = {
     ],
     icons: ["♥", "💖", "❤️", "❤️", "💕", "💕"],
     colors: '#ff6b9d',
-    images: ["https://cdn.deargift.online/uploads/z6654939494311_5eacc5c2b6fdbcbee6dcd20673a8040c.jpg"],
+    images: [""],
     song: "eyenoselip.mp3",
     isHeart: true,
     textHeart: "Thế Sơn",
