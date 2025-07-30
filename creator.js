@@ -214,11 +214,17 @@ async function handleFormSubmit(e) {
         saveGalaxyData(galaxyId, galaxyData);
         
         // Generate links
-        const baseUrl = window.location.origin + window.location.pathname.replace('creator.html', '');
-        // Nếu đang ở localhost, thay thế bằng production URL
-        let productionBaseUrl = baseUrl;
-        if (baseUrl.includes('localhost') || baseUrl.includes('127.0.0.1') || baseUrl.includes('file://')) {
+        let productionBaseUrl;
+        if (window.location.origin.includes('localhost') || 
+            window.location.origin.includes('127.0.0.1') || 
+            window.location.protocol === 'file:') {
+            // Nếu đang ở localhost, dùng production URL
             productionBaseUrl = 'https://deargiftt.netlify.app/';
+        } else {
+            // Nếu đang ở production, dùng URL hiện tại
+            const currentPath = window.location.pathname;
+            const basePath = currentPath.replace('/creator.html', '/');
+            productionBaseUrl = window.location.origin + basePath;
         }
         
         const galaxyLink = `${productionBaseUrl}index.html?id=${galaxyId}`;
