@@ -58,6 +58,11 @@ document.addEventListener('wheel', e => e.preventDefault(), { passive: false });
 
 // --- Load galaxy data ---
 async function loadGalaxyData() {
+    console.log('=== DEBUG loadGalaxyData ===');
+    console.log('Current URL:', window.location.href);
+    console.log('Galaxy ID from URL:', galaxyId);
+    console.log('Is Demo mode:', isDemo);
+    
     if (isDemo) {
         // Ưu tiên lấy dữ liệu custom demo từ localStorage nếu có
         let customDemo = null;
@@ -85,6 +90,9 @@ async function loadGalaxyData() {
         
         // First try to load from localStorage (local galaxies)
         const localGalaxies = JSON.parse(localStorage.getItem('deargift_galaxies') || '{}');
+        console.log('Available galaxies in localStorage:', Object.keys(localGalaxies));
+        console.log('Looking for galaxy ID:', galaxyId);
+        
         if (localGalaxies[galaxyId]) {
             console.log('Galaxy found in localStorage');
             galaxyData = localGalaxies[galaxyId];
@@ -99,6 +107,8 @@ async function loadGalaxyData() {
             loadingScreen.style.display = 'none';
             return;
         }
+        
+        console.log('Galaxy not found in localStorage, trying API...');
         
         // If not found locally, try to fetch from API
         const response = await fetch(`https://dearlove-backend.onrender.com/api/galaxies/${galaxyId}`);
@@ -345,6 +355,14 @@ function createTextParticle() {
 // --- Create image particle ---
 function createImageParticle() {
     if (!galaxyData.images || galaxyData.images.length === 0 || activeParticles.size >= maxParticles) return;
+    
+    // Lọc ra những ảnh hợp lệ
+    const validImages = galaxyData.images.filter(img => {
+        return img && img.trim() && (img.startsWith('data:image/') || img.startsWith('http'));
+    });
+    
+    if (validImages.length === 0) return;
+    
     // Tạo div bọc ngoài
     const wrapper = document.createElement('div');
     wrapper.className = 'text-particle image-particle';
@@ -355,7 +373,7 @@ function createImageParticle() {
     wrapper.style.border = 'none';
     // Tạo img bên trong
     const img = document.createElement('img');
-    img.src = galaxyData.images[Math.floor(Math.random() * galaxyData.images.length)];
+    img.src = validImages[Math.floor(Math.random() * validImages.length)];
     img.style.display = 'block';
     img.style.objectFit = 'cover';
     img.style.borderRadius = '15px';
@@ -383,6 +401,15 @@ function createImageParticle() {
         const maxX = window.innerWidth * (1 + margin) - displayWidth;
         const xPos = minX + Math.random() * (maxX - minX);
         wrapper.style.left = xPos + 'px';
+    };
+    
+    // Handle image load error
+    img.onerror = function() {
+        console.warn('Failed to load image:', img.src);
+        if (wrapper.parentNode) {
+            wrapper.parentNode.removeChild(wrapper);
+        }
+        activeParticles.delete(wrapper);
     };
     // Tăng khoảng rơi theo chiều cao trên mobile
     const zPos = (Math.random() - 0.5) * (isMobile ? 300 : 500);

@@ -131,12 +131,38 @@ function handleImageFiles(files) {
         if (file.type.startsWith('image/')) {
             const reader = new FileReader();
             reader.onload = function(e) {
-                imagesArray.push({
-                    name: file.name,
-                    data: e.target.result,
-                    url: e.target.result
-                });
-                updateImagesDisplay();
+                // Tạo canvas để resize ảnh
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    
+                    // Giới hạn kích thước ảnh để tránh quá lớn
+                    const maxWidth = 800;
+                    const maxHeight = 600;
+                    let { width, height } = img;
+                    
+                    if (width > maxWidth || height > maxHeight) {
+                        const ratio = Math.min(maxWidth / width, maxHeight / height);
+                        width *= ratio;
+                        height *= ratio;
+                    }
+                    
+                    canvas.width = width;
+                    canvas.height = height;
+                    ctx.drawImage(img, 0, 0, width, height);
+                    
+                    // Chuyển thành base64 với chất lượng nén
+                    const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.8);
+                    
+                    imagesArray.push({
+                        name: file.name,
+                        data: compressedDataUrl,
+                        url: compressedDataUrl
+                    });
+                    updateImagesDisplay();
+                };
+                img.src = e.target.result;
             };
             reader.readAsDataURL(file);
         }
@@ -210,8 +236,8 @@ async function handleFormSubmit(e) {
             viewCount: 0
         };
         
-        // Save to localStorage (in production, save to backend)
-        saveGalaxyData(galaxyId, galaxyData);
+        // Save to localStorage and backend
+        await saveGalaxyData(galaxyId, galaxyData);
         
         // Generate links
         let productionBaseUrl;
@@ -229,6 +255,11 @@ async function handleFormSubmit(e) {
         
         const galaxyLink = `${productionBaseUrl}index.html?id=${galaxyId}`;
         const shareLink = `${productionBaseUrl}index.html?id=${galaxyId}`;
+        
+        // Debug log
+        console.log('Generated galaxy ID:', galaxyId);
+        console.log('Production base URL:', productionBaseUrl);
+        console.log('Final galaxy link:', galaxyLink);
         
         // Show result
         showResult(galaxyLink, shareLink, galaxyId);
@@ -288,11 +319,37 @@ function validateFormData(data) {
 }
 
 // Save galaxy data
-function saveGalaxyData(id, data) {
-    // Save to localStorage (in production, send to backend API)
+async function saveGalaxyData(id, data) {
+    // Save to localStorage as backup
     const existingData = JSON.parse(localStorage.getItem('deargift_galaxies') || '{}');
     existingData[id] = data;
     localStorage.setItem('deargift_galaxies', JSON.stringify(existingData));
+    
+    // Debug log
+    console.log('Galaxy saved with ID:', id);
+    console.log('Galaxy data:', data);
+    
+    // Try to save to backend API for cross-device access
+    try {
+        const response = await fetch('https://dearlove-backend.onrender.com/api/galaxies', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                id: id,
+                data: data
+            })
+        });
+        
+        if (response.ok) {
+            console.log('Galaxy successfully saved to backend');
+        } else {
+            console.warn('Failed to save to backend, but localStorage backup available');
+        }
+    } catch (error) {
+        console.warn('Backend save failed, but localStorage backup available:', error);
+    }
     
     // Also save metadata for listing
     const metadata = {
