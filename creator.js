@@ -316,11 +316,18 @@ function showResult(galaxyLink, shareLink, galaxyId) {
 
 // Generate QR code
 function generateQRCode(url, container) {
+    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(url)}`;
+    
     container.innerHTML = `
         <h4 style="margin-bottom: 15px; color: #4ecdc4;">📱 QR Code để chia sẻ</h4>
-        <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(url)}" 
+        <img id="qrImage" src="${qrUrl}" 
              alt="QR Code" 
-             style="border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+             style="border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); max-width: 200px;"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+        <div style="display: none; padding: 20px; background: rgba(255,255,255,0.1); border-radius: 10px; text-align: center;">
+            <p style="margin: 0; color: #ff6b9d;">⚠️ Không thể tạo QR Code</p>
+            <p style="margin: 5px 0 0 0; font-size: 12px; opacity: 0.8;">Vui lòng copy link để chia sẻ</p>
+        </div>
         <p style="margin-top: 10px; font-size: 12px; opacity: 0.8;">Quét mã QR để mở trên điện thoại</p>
     `;
 }
@@ -430,4 +437,3 @@ setInterval(autoSave, 30000);
 
 // Load auto-save on page load
 document.addEventListener('DOMContentLoaded', loadAutoSave);
- 
