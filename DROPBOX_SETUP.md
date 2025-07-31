@@ -13,8 +13,9 @@
 ### Bước 2: Cấu hình App
 1. Trong tab **Settings**:
    - ✅ App key: `6lmeeq8njmvmdnf` (đã cập nhật)
-   - Thêm domain của bạn vào **Redirect URIs**:
+   - ⚠️ **QUAN TRỌNG**: Thêm Redirect URIs chính xác:
      - Localhost: `http://localhost:5500/creator.html`
+     - **Netlify**: `https://deargiftt.netlify.app/creator.html`
      - Production: `https://yourdomain.com/creator.html`
 
 2. Trong tab **Permissions**:
@@ -32,7 +33,26 @@ this.CLIENT_ID = '6lmeeq8njmvmdnf'; // Dropbox App Key đã cập nhật
 
 **Lưu ý bảo mật**: App Secret (`y3kuqdpmnq63u2j`) không được sử dụng trong client-side code để đảm bảo an toàn.
 
-## 🎉 Trạng thái: SẴN SÀNG SỬ DỤNG
+## 🚨 Lỗi hiện tại và cách khắc phục
+
+### Lỗi 401 Unauthorized - Dropbox
+**Nguyên nhân**: Redirect URI chưa được thêm vào Dropbox App
+
+**Khắc phục**:
+1. Vào [Dropbox App Console](https://www.dropbox.com/developers/apps)
+2. Chọn app "DearGift Music" 
+3. Trong tab Settings → Redirect URIs, thêm:
+   ```
+   https://deargiftt.netlify.app/creator.html
+   ```
+4. Nhấn "Add" và "Save"
+
+### Lỗi CORS - Firebase
+**Nguyên nhân**: Firebase Storage CORS configuration
+
+**Tạm thời**: Hệ thống sẽ fallback sang Dropbox upload
+
+## 🎉 Trạng thái: CẦN THIẾT LẬP REDIRECT URI
 
 ✅ **App Key**: Đã cấu hình (`6lmeeq8njmvmdnf`)  
 ✅ **Permissions**: Cần thiết lập trong Dropbox Console  

@@ -580,14 +580,14 @@
                             class="file-input" 
                             id="backgroundMusic" 
                             accept="audio/*"
-                            onchange="handleDropboxMusicUpload(this)"
+                            onchange="handleEnhancedMusicUpload(this)"
                         >
                         <div id="musicUploadStatus" style="margin-top: 10px; min-height: 24px; color: #ff6b9d; font-size: 14px;"></div>
                         <div id="musicPreviewContainer" style="margin-top: 10px; display: none;">
                             <button type="button" class="btn" id="previewUploadedMusicBtn" style="background: #4ecdc4; color: white; width: 100%;">▶️ Nghe thử nhạc đã tải lên</button>
                         </div>
                         <small style="color: rgba(255,255,255,0.7); margin-top: 5px; display: block;">
-                            Hỗ trợ: MP3, WAV, OGG (tối đa 50MB) - Tự động upload lên Dropbox
+                            Hỗ trợ: MP3, WAV, OGG (tối đa 50MB) - Tự động thử Dropbox → Firebase → Local
                         </small>
                     </div>
                 </div>
@@ -903,6 +903,9 @@
     
     <!-- Dropbox Music Uploader -->
     <script src="dropbox-uploader.js"></script>
+    
+    <!-- Enhanced Music Upload (Multiple fallbacks) -->
+    <script src="enhanced-music-upload.js"></script>
     
     <!-- Firebase Music Uploader -->
     <script src="firebase-music-uploader.js"></script>

@@ -203,7 +203,12 @@ class DropboxUploader {
                     email: userData.email
                 };
             } else {
-                return { success: false, error: 'Connection failed' };
+                // Token might be expired or invalid
+                if (response.status === 401) {
+                    this.logout(); // Clear invalid token
+                    return { success: false, error: 'Authentication expired', needsAuth: true };
+                }
+                return { success: false, error: `HTTP ${response.status}` };
             }
         } catch (error) {
             return { success: false, error: error.message };
@@ -247,7 +252,17 @@ window.uploadMusicToDropbox = async function(file, onProgress) {
         // Test connection first
         const connectionTest = await window.dropboxUploader.testConnection();
         if (!connectionTest.success) {
-            throw new Error(`Dropbox connection failed: ${connectionTest.error}`);
+            if (connectionTest.needsAuth) {
+                // Token expired, need re-authentication
+                if (confirm('Phiên đăng nhập Dropbox đã hết hạn. Bạn có muốn đăng nhập lại?')) {
+                    window.dropboxUploader.authenticate();
+                    return { success: false, error: 'Re-authentication required' };
+                } else {
+                    throw new Error('Dropbox authentication required');
+                }
+            } else {
+                throw new Error(`Dropbox connection failed: ${connectionTest.error}`);
+            }
         }
 
         if (onProgress) onProgress(5, `Kết nối Dropbox thành công (${connectionTest.user})`);
