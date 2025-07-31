@@ -572,13 +572,19 @@
                     
                     <!-- Upload music -->
                     <div id="uploadMusic" class="music-tab-content" style="display: none;">
+                        <label for="backgroundMusic" class="file-input-label" style="margin-bottom: 10px;">
+                            📁 Chọn file nhạc để tải lên
+                        </label>
                         <input 
                             type="file" 
-                            class="form-control" 
+                            class="file-input" 
                             id="backgroundMusic" 
                             accept="audio/*"
-                            style="padding: 8px;"
                         >
+                        <div id="musicUploadStatus" style="margin-top: 10px; min-height: 24px; color: #ff6b9d; font-size: 14px;"></div>
+                        <div id="musicPreviewContainer" style="margin-top: 10px; display: none;">
+                            <button type="button" class="btn" id="previewUploadedMusicBtn" style="background: #4ecdc4; color: white; width: 100%;">▶️ Nghe thử nhạc đã tải lên</button>
+                        </div>
                         <small style="color: rgba(255,255,255,0.7); margin-top: 5px; display: block;">
                             Hỗ trợ: MP3, WAV, OGG (tối đa 10MB)
                         </small>
