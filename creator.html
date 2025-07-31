@@ -517,81 +517,6 @@
                     <div class="preview-images" id="previewImages"></div>
                 </div>
 
-                <!-- Nhạc nền -->
-                <div class="form-group">
-                    <label for="musicSelection">🎵 Nhạc nền</label>
-                    
-                    <!-- Audio Enable Button -->
-                    <div id="audioEnableSection" style="margin-bottom: 15px; text-align: center;">
-                        <button id="enableAudioBtn" onclick="enableAudio()" style="
-                            padding: 10px 20px;
-                            background: linear-gradient(45deg, #ff6b9d, #4ecdc4);
-                            border: none;
-                            border-radius: 8px;
-                            color: white;
-                            font-family: 'Orbitron', sans-serif;
-                            font-weight: 600;
-                            cursor: pointer;
-                            transition: all 0.3s ease;
-                        ">
-                            🔊 Kích hoạt Audio để nghe nhạc
-                        </button>
-                        <p style="font-size: 12px; opacity: 0.8; margin-top: 5px;">
-                            Click để cho phép phát nhạc trên trình duyệt
-                        </p>
-                    </div>
-                    
-                    <!-- Music selection tabs -->
-                    <div class="music-tabs" style="display: flex; gap: 10px; margin-bottom: 15px;">
-                        <button type="button" class="tab-btn active" onclick="showMusicTab('preset')" id="presetTab">
-                            📀 Nhạc có sẵn
-                        </button>
-                        <button type="button" class="tab-btn" onclick="showMusicTab('upload')" id="uploadTab">
-                            📁 Tải lên
-                        </button>
-                    </div>
-                    
-                    <!-- Preset music selection -->
-                    <div id="presetMusic" class="music-tab-content">
-                        <div class="music-categories" style="margin-bottom: 15px;">
-                            <select id="musicCategory" class="form-control" style="margin-bottom: 10px;" onchange="loadSongsByCategory()">
-                                <option value="">-- Chọn thể loại --</option>
-                                <option value="love">💕 Tình yêu</option>
-                                <option value="birthday">🎂 Sinh nhật</option>
-                                <option value="trending">🔥 Trending</option>
-                                <option value="instrumental">🎼 Nhạc không lời</option>
-                            </select>
-                        </div>
-                        
-                        <div id="songList" class="song-list" style="display: none;">
-                            <div class="songs-container" style="max-height: 150px; overflow-y: auto; border: 1px solid rgba(255,107,157,0.3); border-radius: 8px; padding: 10px;">
-                                <!-- Songs will be loaded here -->
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Upload music -->
-                    <div id="uploadMusic" class="music-tab-content" style="display: none;">
-                        <label for="backgroundMusic" class="file-input-label" style="margin-bottom: 10px;">
-                            📁 Chọn file nhạc để tải lên Dropbox
-                        </label>
-                        <input 
-                            type="file" 
-                            class="file-input" 
-                            id="backgroundMusic" 
-                            accept="audio/*"
-                            onchange="handleEnhancedMusicUpload(this)"
-                        >
-                        <div id="musicUploadStatus" style="margin-top: 10px; min-height: 24px; color: #ff6b9d; font-size: 14px;"></div>
-                        <div id="musicPreviewContainer" style="margin-top: 10px; display: none;">
-                            <button type="button" class="btn" id="previewUploadedMusicBtn" style="background: #4ecdc4; color: white; width: 100%;">▶️ Nghe thử nhạc đã tải lên</button>
-                        </div>
-                        <small style="color: rgba(255,255,255,0.7); margin-top: 5px; display: block;">
-                            Hỗ trợ: MP3, WAV, OGG (tối đa 50MB) - Tự động thử Dropbox → Firebase → Local
-                        </small>
-                    </div>
-                </div>
-
                 <!-- Tên hiển thị trên trái tim -->
                 <div class="form-group">
                     <label for="heartText">💝 Tên hiển thị trên trái tim</label>
@@ -895,26 +820,6 @@
             });
         };
     </script>
-    
-    <!-- Firebase CDN -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
-    
-    <!-- Dropbox Music Uploader -->
-    <script src="dropbox-uploader.js"></script>
-    
-    <!-- Enhanced Music Upload (Multiple fallbacks) -->
-    <script src="enhanced-music-upload.js"></script>
-    
-    <!-- Firebase Music Uploader -->
-    <script src="firebase-music-uploader.js"></script>
-    
-    <!-- Smart Music Uploader (Firebase + Blob fallback) -->
-    <script src="smart-music-uploader.js"></script>
-    
-    <!-- Music Upload Manager -->
-    <script src="music-upload.js"></script>
     
     <!-- Main Creator Script -->
     <script src="creator.js"></script>
