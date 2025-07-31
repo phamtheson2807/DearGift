@@ -41,9 +41,13 @@ class SmartMusicUploader {
                         firebaseError.message.includes('permission') ||
                         firebaseError.message.includes('auth') ||
                         firebaseError.message.includes('ERR_FAILED') ||
+                        firebaseError.message.includes('access control') ||
+                        firebaseError.message.includes('preflight') ||
+                        firebaseError.message.includes('HTTP ok status') ||
                         firebaseError.code === 'storage/unauthorized' ||
-                        firebaseError.code === 'storage/unknown') {
-                        console.log('Firebase/CORS issue detected, falling back to Blob URL...');
+                        firebaseError.code === 'storage/unknown' ||
+                        firebaseError.code === 'storage/invalid-url') {
+                        console.log('Firebase/CORS/Network issue detected, falling back to Blob URL...');
                         return await this.uploadAsBlob(file, progressCallback);
                     } else {
                         throw firebaseError;

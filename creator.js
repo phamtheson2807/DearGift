@@ -652,18 +652,28 @@ async function getFormData() {
   else {
     const musicFile = document.getElementById("backgroundMusic").files[0];
     if (musicFile) {
-      // For demo: convert to base64 for localStorage
-      try {
-        musicData = await new Promise((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onload = () => resolve(reader.result);
-          reader.onerror = reject;
-          reader.readAsDataURL(musicFile);
-        });
-        console.log('Using legacy file input as base64');
-      } catch (error) {
-        console.error('Error converting music file to base64:', error);
-        musicData = null;
+      // Check file size before converting to base64
+      const maxSizeForFirestore = 500 * 1024; // 500KB limit for Firestore
+      
+      if (musicFile.size > maxSizeForFirestore) {
+        console.warn(`Music file too large for Firestore (${(musicFile.size / 1024).toFixed(1)}KB), skipping music for server save`);
+        // For large files, only use for demo/local - don't save to Firestore
+        showToast(`⚠️ File nhạc quá lớn (${(musicFile.size / 1024 / 1024).toFixed(1)}MB), chỉ hoạt động local`, 'warning');
+        musicData = null; // Don't include in Firestore data
+      } else {
+        // For smaller files: convert to base64
+        try {
+          musicData = await new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = reject;
+            reader.readAsDataURL(musicFile);
+          });
+          console.log('Using legacy file input as base64 (small file)');
+        } catch (error) {
+          console.error('Error converting music file to base64:', error);
+          musicData = null;
+        }
       }
     }
   }
@@ -799,23 +809,48 @@ async function handleEnhancedMusicUpload(e) {
     
     console.log('Enhanced music upload completed:', result);
     
-    // Show success message
-    const uploadType = result.isFirebaseUpload ? 'Firebase Storage' : 
-                      result.isBlobUpload ? 'Local (Development)' : 'Base64 (Demo)';
-    uploadStatus.innerHTML = `✅ Upload thành công via ${uploadType}: ${result.originalName} (${(result.size / 1024 / 1024).toFixed(2)}MB)`;
-    uploadStatus.style.color = '#4CAF50';
+    // Show success message with detailed info
+    let uploadType = 'Firebase Storage';
+    let statusColor = '#4CAF50';
+    let extraInfo = '';
+    
+    if (result.isFirebaseUpload) {
+      uploadType = 'Firebase Storage';
+      extraInfo = ' (Permanent link)';
+    } else if (result.isBlobUpload) {
+      uploadType = 'Local (Development)';
+      extraInfo = ' (Temp link - only for this session)';
+      statusColor = '#ff9800';
+    } else if (result.isBase64) {
+      uploadType = 'Base64 (Demo)';
+      extraInfo = ' (For demo only)';
+      statusColor = '#ff9800';
+    }
+    
+    uploadStatus.innerHTML = `✅ Upload thành công via ${uploadType}: ${result.originalName} (${(result.size / 1024 / 1024).toFixed(2)}MB)${extraInfo}`;
+    uploadStatus.style.color = statusColor;
+    
+    // Show additional warning for non-Firebase uploads
+    if (!result.isFirebaseUpload) {
+      setTimeout(() => {
+        showToast(`⚠️ Firebase Storage không khả dụng, sử dụng ${uploadType}. Nhạc vẫn hoạt động bình thường!`, 'warning');
+      }, 1000);
+    }
     
   } catch (error) {
     console.error('Enhanced music upload error:', error);
     uploadStatus.innerHTML = `❌ Upload thất bại: ${error.message}`;
     uploadStatus.style.color = '#f44336';
     uploadedMusicFile = null;
+    
+    // Show detailed error help
+    showToast(`❌ Upload nhạc thất bại: ${error.message}. Thử file nhỏ hơn hoặc chọn nhạc có sẵn.`, 'error');
   }
 }
 
 // Save galaxy data
 async function saveGalaxyData(id, data) {
-  // Save to localStorage as backup
+  // Save to localStorage as backup (always save full data locally)
   const existingData = JSON.parse(
     localStorage.getItem("deargift_galaxies") || "{}"
   );
@@ -825,6 +860,22 @@ async function saveGalaxyData(id, data) {
   // Debug log
   console.log("Galaxy saved to localStorage with ID:", id);
   console.log("Galaxy data:", data);
+
+  // Prepare data for Firestore (check size limits)
+  let firestoreData = { ...data };
+  
+  // Check if song data is too large for Firestore
+  if (firestoreData.song) {
+    const songDataSize = new Blob([firestoreData.song]).size;
+    const maxFirestoreSize = 1000000; // ~1MB limit for Firestore documents
+    
+    if (songDataSize > maxFirestoreSize) {
+      console.warn(`Song data too large for Firestore (${(songDataSize / 1024).toFixed(1)}KB), saving without music`);
+      // Create a version without music for Firestore
+      firestoreData = { ...data, song: null, hasLargeMusic: true };
+      showToast(`⚠️ Nhạc quá lớn cho server, chỉ lưu tạm local. Galaxy vẫn hoạt động bình thường!`, 'warning');
+    }
+  }
 
   // Lưu lên Firestore (với error handling tốt hơn)
   try {
@@ -837,13 +888,17 @@ async function saveGalaxyData(id, data) {
       throw new Error('Firestore not available');
     }
     
-    // Test Firestore connection
+    // Test Firestore connection với dữ liệu đã được tối ưu
     console.log('Testing Firestore connection...');
-    await db.collection("galaxies").doc(id).set(data);
+    await db.collection("galaxies").doc(id).set(firestoreData);
     console.log("✅ Galaxy saved to Firestore successfully:", id);
     
     // Show success message
-    showToast("✅ Galaxy đã được lưu lên server thành công!");
+    if (firestoreData.hasLargeMusic) {
+      showToast("✅ Galaxy đã tạo thành công! (Nhạc lưu tạm local do kích thước lớn)");
+    } else {
+      showToast("✅ Galaxy đã được lưu lên server thành công!");
+    }
     
   } catch (error) {
     console.error("Error saving to Firestore:", error);
@@ -855,6 +910,8 @@ async function saveGalaxyData(id, data) {
       errorMessage += "Không có quyền truy cập Firestore. ";
     } else if (error.code === 'unavailable') {
       errorMessage += "Server tạm thời không khả dụng. ";
+    } else if (error.code === 'invalid-argument' && error.message.includes('bytes')) {
+      errorMessage += "Dữ liệu quá lớn cho server. ";
     } else if (error.message.includes('network')) {
       errorMessage += "Lỗi kết nối mạng. ";
     } else {
