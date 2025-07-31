@@ -1,0 +1,362 @@
+* {
+    margin: 0;
+    padding: 0;
+    font-family: 'Poppins', sans-serif;
+    box-sizing: border-box;
+}
+
+body {
+    background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+    color: white;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+
+h1 {
+    font-size: 2.5rem;
+    font-weight: 900;
+    margin-bottom: 1rem;
+    background: linear-gradient(45deg, #ff6b9d, #4ecdc4);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+#qrCode {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 2rem;
+}
+
+#qrCode canvas {
+    border-radius: 15px;
+}
+
+.form-container {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 2rem;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+}
+
+.form-group {
+    margin-bottom: 2rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 700;
+    color: #4ecdc4;
+}
+
+.form-group textarea,
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 1rem;
+    border: 2px solid rgba(78, 205, 196, 0.3);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    color: rgb(18, 168, 192);
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1rem;
+}
+
+.form-group textarea {
+    height: 150px;
+    resize: vertical;
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: #4ecdc4;
+    box-shadow: 0 0 20px rgba(78, 205, 196, 0.3);
+}
+
+.color-picker-group {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.color-option {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.color-preview {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.icon-selector {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.icon-option {
+    padding: 1rem;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.05);
+    cursor: pointer;
+    text-align: center;
+    font-size: 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.icon-option:hover,
+.icon-option.selected {
+    border-color: #4ecdc4;
+    background: rgba(78, 205, 196, 0.2);
+    transform: scale(1.1);
+}
+
+.btn {
+    width: 100%;
+    padding: 1rem 2rem;
+    font-size: 1.1rem;
+    font-weight: 700;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    background: linear-gradient(45deg, #ff6b9d, #4ecdc4);
+    color: white;
+    font-family: 'Orbitron', sans-serif;
+    transition: all 0.3s ease;
+    margin-top: 20px;
+}
+
+.btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 30px rgba(255, 107, 157, 0.4);
+}
+
+.btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #4ecdc4;
+    text-decoration: none;
+    font-weight: 700;
+    margin-bottom: 2rem;
+    transition: all 0.3s ease;
+}
+
+.back-btn:hover {
+    color: white;
+    transform: translateX(-5px);
+}
+
+.loading {
+    display: none;
+    text-align: center;
+    padding: 2rem;
+}
+
+.loading-spinner {
+    width: 50px;
+    height: 50px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-top: 3px solid #4ecdc4;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 1rem;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.result {
+    display: none;
+    text-align: center;
+    padding: 2rem;
+    background: rgba(78, 205, 196, 0.1);
+    border-radius: 15px;
+    border: 2px solid #4ecdc4;
+    margin-top: 2rem;
+}
+
+.result-link {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 1rem;
+    border-radius: 10px;
+    margin: 1rem 0;
+    word-break: break-all;
+    font-family: monospace;
+}
+
+.copy-btn {
+    background: transparent;
+    border: 2px solid #4ecdc4;
+    color: #4ecdc4;
+    padding: 0.5rem 1rem;
+    border-radius: 25px;
+    cursor: pointer;
+    font-family: 'Orbitron', sans-serif;
+    transition: all 0.3s ease;
+}
+
+.copy-btn:hover {
+    background: rgba(78, 205, 196, 0.2);
+}
+
+/* Custom checkbox style */
+.form-group input[type="checkbox"] {
+    accent-color: #4ecdc4;
+    width: 20px;
+    height: 20px;
+    margin-right: 8px;
+    vertical-align: middle;
+    cursor: pointer;
+    border-radius: 6px;
+    box-shadow: 0 2px 8px #4ecdc422;
+    transition: box-shadow 0.2s;
+}
+
+.form-group input[type="checkbox"]:focus {
+    outline: 2px solid #ff6b9d;
+    box-shadow: 0 0 0 3px #ff6b9d44;
+}
+
+/* Optional: make label text a bit larger for better touch */
+.form-group label {
+    font-size: 1.08em;
+    cursor: pointer;
+    /* user-select: none; */
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 0 10px;
+    }
+
+    h1 {
+        font-size: 2rem;
+    }
+
+    .form-container {
+        padding: 1.5rem;
+    }
+
+    #viewBtn.btn {
+        width: 100%;
+        min-width: unset;
+        font-size: 1rem;
+        padding: 0.9rem 0.5rem;
+        margin-top: 6rem;
+    }
+
+    .icon-selector {
+        grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
+    }
+}
+
+/* Voucher Section */
+#voucherSection {
+    margin-bottom: 16px;
+}
+
+.voucher-item {
+    padding: 10px 16px;
+    margin-bottom: 10px;
+    border: 1.5px solid #e0e0f0;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    background: none;
+    transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+    box-shadow: 0 1px 4px rgba(108, 99, 255, 0.04);
+    position: relative;
+}
+
+.voucher-item:hover {
+    border-color: #6c63ff;
+    background: #021e24;
+    box-shadow: 0 2px 8px rgba(108, 99, 255, 0.10);
+}
+
+.voucher-item input[type="radio"] {
+    accent-color: #6c63ff;
+    width: 18px;
+    height: 18px;
+    margin-right: 8px;
+}
+
+.voucher-item label {
+    flex: 1;
+    cursor: pointer;
+    font-size: 15px;
+    color: #dedbdb;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.voucher-item b {
+    color: #eaeaea;
+    font-size: 16px;
+    letter-spacing: 1px;
+}
+
+.voucher-item input[type="radio"]:checked+label b {
+    text-decoration: underline;
+}
+
+.voucher-item input[type="radio"]:checked+label {
+    color: #ff1d2c;
+    font-weight: bold;
+}
+
+.checkbox {
+    width: 18px;
+    height: 18px;
+    accent-color: #6c63ff;
+    border-radius: 50px;
+    margin-right: 8px;
+}
+
+
+#voucherList span {
+    font-size: 14px;
+    color: #888;
+}

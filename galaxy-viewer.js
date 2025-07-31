@@ -1,6 +1,7 @@
 // --- URL Params (Safari compatible) ---
 var urlParams = new URLSearchParams(window.location.search);
 var galaxyId = urlParams.get('id');
+var tempId = urlParams.get('tempId'); // For demo preview
 var isDemo = urlParams.get('demo') === '1' || window.isDemoFallback;
 
 // --- Demo Data ---
@@ -100,6 +101,35 @@ function loadGalaxyData() {
     console.log('Is Demo mode:', isDemo);
     
     if (isDemo) {
+        // Check for temporary demo data first (from creator preview)
+        if (tempId) {
+            try {
+                var tempDemo = localStorage.getItem('temp_demo_galaxy');
+                if (tempDemo) {
+                    tempDemo = JSON.parse(tempDemo);
+                    if (tempDemo.id === tempId) {
+                        galaxyData = {
+                            messages: [tempDemo.message || 'Welcome to your galaxy preview!'],
+                            icons: ["♥", "💖", "❤️"],
+                            colors: '#ff6b9d',
+                            images: tempDemo.images || [""],
+                            song: tempDemo.musicUrl || null,
+                            isHeart: true,
+                            textHeart: tempDemo.title || "Demo Galaxy",
+                            isSave: true,
+                            createdAt: tempDemo.createdAt || new Date().toISOString(),
+                            musicVolume: tempDemo.musicVolume || 0.5
+                        };
+                        showStartButton();
+                        loadingScreen.style.display = 'none';
+                        return;
+                    }
+                }
+            } catch(e) {
+                console.warn('Error loading temp demo data:', e);
+            }
+        }
+        
         // Ưu tiên lấy dữ liệu custom demo từ localStorage nếu có
         var customDemo = null;
         try {

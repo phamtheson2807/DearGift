@@ -258,6 +258,57 @@ function selectSong(song, element) {
   console.log('Selected song:', song);
 }
 
+// Handle demo preview functionality (integrated from create.html)
+async function handleDemoPreview() {
+  const messageInput = document.getElementById("message");
+  if (!messageInput) return;
+  
+  const userMessage = messageInput.value.trim();
+  
+  // Check for music input (both types)
+  const musicFile = document.getElementById('backgroundMusic')?.files[0] || 
+                    document.getElementById('customSongFile')?.files[0];
+  
+  let musicBase64 = null;
+  
+  if (musicFile) {
+    try {
+      // Convert to base64 for demo mode
+      musicBase64 = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          const base64 = reader.result;
+          resolve(base64);
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(musicFile);
+      });
+    } catch (error) {
+      console.warn("Couldn't convert music for demo:", error);
+      // Continue without music
+    }
+  }
+  
+  // Create demo data with user's input
+  const demoData = {
+    id: 'demo-' + Date.now(),
+    title: 'Demo Galaxy',
+    message: userMessage || 'Welcome to your galaxy preview!',
+    creator: 'Demo User',
+    createdAt: new Date().toISOString(),
+    musicUrl: musicBase64 || null,
+    musicVolume: 0.5,
+    isDemo: true
+  };
+  
+  // Store in localStorage temporarily for demo
+  localStorage.setItem('temp_demo_galaxy', JSON.stringify(demoData));
+  
+  // Open demo in new tab
+  const demoUrl = `index.html?demo=1&tempId=${demoData.id}`;
+  window.open(demoUrl, '_blank');
+}
+
 function previewSong(url, songId) {
   // Use the global previewMusic function from creator.html
   if (typeof window.previewMusic === 'function') {
@@ -321,13 +372,23 @@ function initializeFormHandlers() {
   // Handle image upload
   imagesInput.addEventListener("change", handleImageUpload);
 
-  // Handle music upload
+  // Handle music upload - Enhanced version
   const musicInput = document.getElementById("backgroundMusic");
   if (musicInput) {
-    musicInput.addEventListener("change", handleMusicUpload);
+    musicInput.addEventListener("change", handleEnhancedMusicUpload);
+  }
+  
+  // Also handle custom song file input if it exists (for compatibility)
+  const customSongFile = document.getElementById("customSongFile");
+  if (customSongFile) {
+    customSongFile.addEventListener("change", handleEnhancedMusicUpload);
   }
 
-  // Handle drag and drop for images
+  // Handle demo preview button (integrated from create.html)
+  const viewDemoBtn = document.getElementById("viewDemoBtn");
+  if (viewDemoBtn) {
+    viewDemoBtn.addEventListener("click", handleDemoPreview);
+  }
   const fileInputLabel = document.querySelector(".file-input-label");
   fileInputLabel.addEventListener("dragover", function (e) {
     e.preventDefault();
@@ -477,8 +538,8 @@ async function handleFormSubmit(e) {
   if (submitBtn) submitBtn.disabled = true;
 
   try {
-    // Get form data
-    const formData = getFormData();
+    // Get form data (now async to handle music file conversion)
+    const formData = await getFormData();
 
     // Validate form data
     if (!validateFormData(formData)) {
@@ -544,7 +605,7 @@ async function handleFormSubmit(e) {
 }
 
 // Get form data
-function getFormData() {
+async function getFormData() {
   const messages = document
     .getElementById("messages")
     .value.split("\n")
@@ -556,24 +617,36 @@ function getFormData() {
   const enableHeart = document.getElementById("enableHeart").checked;
   const hideFooter = document.getElementById("hideFooter").checked;
 
-  // Handle music selection
+  // Handle music selection with priority order
   let musicData = null;
   
-  // Check if preset music is selected
-  if (selectedSong) {
-    musicData = selectedSong.url;
-  } else if (uploadedMusicFile) {
-    // Use uploaded music file
+  // Priority 1: Check if custom music file was uploaded via the uploader
+  if (uploadedMusicFile && uploadedMusicFile.url) {
     musicData = uploadedMusicFile.url;
-    
-    // In a real app, you would upload the file to server here
-    // For demo purposes, we'll use the local file URL
-    console.log('Using uploaded music:', uploadedMusicFile);
-  } else {
-    // Fallback: check for legacy file input
+    console.log('Using uploaded music file:', uploadedMusicFile);
+  } 
+  // Priority 2: Check if a preset song is selected
+  else if (selectedSong) {
+    musicData = selectedSong.url;
+    console.log('Using preset song:', selectedSong);
+  } 
+  // Priority 3: Fallback to legacy file input (for backward compatibility)
+  else {
     const musicFile = document.getElementById("backgroundMusic").files[0];
     if (musicFile) {
-      musicData = `./songs/uploads/temp_${musicFile.name}`;
+      // For demo: convert to base64 for localStorage
+      try {
+        musicData = await new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result);
+          reader.onerror = reject;
+          reader.readAsDataURL(musicFile);
+        });
+        console.log('Using legacy file input as base64');
+      } catch (error) {
+        console.error('Error converting music file to base64:', error);
+        musicData = null;
+      }
     }
   }
 
@@ -602,6 +675,124 @@ function validateFormData(data) {
   }
 
   return true;
+}
+
+// Smart Music Upload Handler (integrated from create.html)
+async function handleSmartMusicUpload(file, progressCallback) {
+  console.log('Starting smart music upload for file:', file.name);
+  
+  // Validate file
+  if (!file || !file.type.startsWith('audio/')) {
+    throw new Error('File không phải là file âm thanh hợp lệ');
+  }
+  
+  if (file.size > 10 * 1024 * 1024) { // 10MB limit
+    throw new Error('File âm thanh vượt quá 10MB!');
+  }
+  
+  try {
+    // Try Firebase Storage first if available
+    if (window.smartMusicUploader) {
+      console.log('Using Smart Music Uploader (Firebase + Blob fallback)');
+      const result = await window.smartMusicUploader.uploadMusic(file, progressCallback);
+      return {
+        url: result.downloadURL,
+        originalName: result.originalName,
+        fileName: result.fileName,
+        size: result.size,
+        type: result.type,
+        isFirebaseUpload: !result.isBlobUpload,
+        uploadedAt: result.uploadedAt || new Date().toISOString()
+      };
+    } else {
+      // Fallback to base64 conversion (like create.html demo mode)
+      console.log('Using base64 fallback for music upload');
+      const base64Data = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+      
+      // Simulate progress for UI feedback
+      if (progressCallback) {
+        for (let i = 0; i <= 100; i += 10) {
+          setTimeout(() => progressCallback(i), i * 10);
+        }
+      }
+      
+      return {
+        url: base64Data,
+        originalName: file.name,
+        fileName: `base64_${Date.now()}_${file.name}`,
+        size: file.size,
+        type: file.type,
+        isFirebaseUpload: false,
+        isBlobUpload: false,
+        isBase64: true,
+        uploadedAt: new Date().toISOString()
+      };
+    }
+  } catch (error) {
+    console.error('Music upload failed:', error);
+    throw new Error(`Upload thất bại: ${error.message}`);
+  }
+}
+
+// Enhanced music upload handler
+async function handleEnhancedMusicUpload(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  
+  const uploadStatus = document.getElementById('musicUploadStatus') || 
+    (() => {
+      // Create upload status element if it doesn't exist
+      const status = document.createElement('div');
+      status.id = 'musicUploadStatus';
+      status.style.cssText = `
+        margin-top: 10px;
+        padding: 8px;
+        border-radius: 6px;
+        background: rgba(255, 107, 157, 0.1);
+        border: 1px solid rgba(255, 107, 157, 0.3);
+        color: #ff6b9d;
+        font-size: 13px;
+        display: none;
+      `;
+      e.target.parentNode.appendChild(status);
+      return status;
+    })();
+  
+  uploadStatus.style.display = 'block';
+  uploadStatus.innerHTML = '⏳ Chuẩn bị upload nhạc...';
+  
+  try {
+    const result = await handleSmartMusicUpload(file, (progress) => {
+      uploadStatus.innerHTML = `📤 Đang upload nhạc (${progress.toFixed(1)}%)...`;
+    });
+    
+    // Store uploaded music info globally
+    uploadedMusicFile = result;
+    
+    // Clear preset selection when uploading custom music
+    selectedSong = null;
+    const allSongItems = document.querySelectorAll('.song-item');
+    allSongItems.forEach(item => item.classList.remove('selected'));
+    
+    console.log('Enhanced music upload completed:', result);
+    
+    // Show success message
+    const uploadType = result.isFirebaseUpload ? 'Firebase Storage' : 
+                      result.isBlobUpload ? 'Local (Development)' : 'Base64 (Demo)';
+    uploadStatus.innerHTML = `✅ Upload thành công via ${uploadType}: ${result.originalName} (${(result.size / 1024 / 1024).toFixed(2)}MB)`;
+    uploadStatus.style.color = '#4CAF50';
+    
+  } catch (error) {
+    console.error('Enhanced music upload error:', error);
+    uploadStatus.innerHTML = `❌ Upload thất bại: ${error.message}`;
+    uploadStatus.style.color = '#f44336';
+    uploadedMusicFile = null;
+  }
 }
 
 // Save galaxy data

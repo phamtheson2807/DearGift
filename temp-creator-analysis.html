@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' https: data: blob:;">
+    <meta name="referrer" content="no-referrer">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <!-- <meta http-equiv="X-Frame-Options" content="DENY"> -->
+    <title>Tạo hạnh phúc</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Orbitron:wght@400;700&display=swap"
+        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400&display=swap" rel="stylesheet">
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-GTY3RQNXTE"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'G-GTY3RQNXTE');
+    </script>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1512063810748748"
+        crossorigin="anonymous"></script>
+    <link rel="icon" type="image/png" href="./logo.png">
+    <link rel="stylesheet" href="./create.css">
+    <link rel="stylesheet" href="./dialogthank.css">
+</head>
+
+<body>
+    <div class="container">
+        <a href="index.html" class="back-btn">← Về trang chủ</a>
+        <div id="google_translate_element"></div>
+    <style>
+      #google_translate_element {
+        position: fixed;
+        top: 18px;
+        right: 18px;
+        z-index: 99999;
+        background: rgba(255,255,255,0.95);
+        border-radius: 12px;
+        box-shadow: 0 4px 18px #0002;
+        padding: 6px 16px 6px 10px;
+        min-width: 120px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      #google_translate_element * {
+        font-family: 'Poppins', 'Arial', sans-serif !important;
+        font-size: 15px !important;
+      }
+      .goog-te-gadget-simple {
+        background: none !important;
+        border: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        color: #222 !important;
+      }
+      .goog-te-gadget-icon {
+        display: none !important;
+      }
+      .goog-te-menu-value {
+        color: #4ecdc4 !important;
+        font-weight: bold !important;
+        padding-right: 10px !important;
+      }
+      .goog-te-arrow {
+        color: #ff6b9d !important;
+      }
+      @media (max-width: 600px) {
+        #google_translate_element {
+          top: 8px;
+          right: 4px;
+          padding: 4px 8px 4px 6px;
+          min-width: 80px;
+        }
+        #google_translate_element * {
+          font-size: 13px !important;
+        }
+      }
+    </style>
+        <div class="header">
+            <h1>Gửi ngàn yêu thương</h1>
+            <p>hãy gửi những lời yêu thương của bạn vào vũ trụ,</p>
+        </div>
+
+        <div class="form-container">
+            <form id="galaxyForm">
+                <div class="form-group">
+                    <label for="messages">Tin nhắn của bạn (mỗi dòng một tin nhắn):</label>
+                    <textarea id="messages" rows="6" style="width:100%;" placeholder="Happy Birthday
+I love you
+Chúc mừng sinh nhật
+Yêu em nhiều lắm
+càng nhiều sẽ càng đẹp nhé..." required></textarea>
+                    <small style="opacity: 0.7;">Mỗi dòng sẽ là một tin nhắn bay trong vũ trụ</small>
+                </div>
+
+                <div class="form-group">
+                    <label>Chọn biểu tượng muốn hiển thị:</label>
+                    <div class="icon-selector" id="iconSelector">
+                        <div class="icon-option selected" data-icons='["♥", "💖", "💕", "💗"]'>♥💖💕💗</div>
+                        <div class="icon-option" data-icons='["🎉", "🎂", "🎈", "🎊"]'>🎉🎂🎈🎊</div>
+                        <div class="icon-option" data-icons='["🌟", "✨", "⭐", "🌠"]'>🌟✨ ⭐🌠</div>
+                        <div class="icon-option" data-icons='["🌸", "🌺", "🌻", "🌹"]'>🌸🌺🌻🌹</div>
+                        <div class="icon-option" data-icons='["🦋", "🐝", "🌈", "☀️"]'>🦋🐝🌈☀️</div>
+                        <div class="icon-option" data-icons='["😊", "😍", "🥰", "😘"]'>😊😍🥰😘</div>
+                    </div>
+                    <input type="text" id="customIcons"
+                        placeholder="Hoặc nhập icon riêng, cách nhau bởi dấu phẩy (VD: 🐱,🐶,🦄)"
+                        style="margin-top:1rem;width:100%;padding:0.5rem;">
+                </div>
+
+                <div class="form-group">
+                    <label for="song">Chọn bài hát (có thể bỏ qua):</label>
+                    <p style="font-size: 0.9em; color: #ccc; margin-bottom: 0.5rem;">
+                        khi xem hãy click vào màn hình để phát được nhạc nhé! một số máy android sẽ không hỗ trợ phát
+                        nhạc
+                    </p>
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <select id="song">
+                            <option value="" selected>-- Chọn một bài hát có sẵn --</option>
+                            <option value="happy-birthday.mp3">Happy Birthday</option>
+                            <option value="happybirtday_uia.mp3">Happy Birthday Mèo U I A</option>
+                            <option value="happybirthday_domixi.mp3">Happy Birthday Độ Mixi</option>
+                            <option value="eyenoselip.mp3">Eyes, Nose, Lips</option>
+                            <option value="anhnangcuaanh.mp3">Anh nắng của anh</option>
+                            <option value="denbenanh.mp3">Đến bên anh "DangRangTo"</option>
+                            <option value="dunglamtraitimanhdau.mp3">Đừng làm trái tim anh đau</option>
+                            <option value="suynghitronganh.mp3">Suy nghĩ trong anh</option>
+                            <option value="yeuemhonmoingay.mp3">Yêu em hơn mỗi ngày</option>
+                            <option value="phepmau.mp3">Phép màu</option>
+                            <option value="lambantraianhe.mp3">Nhạc tỏ tình</option>
+                        </select>
+                        <button type="button" id="previewDefaultSongBtn" title="Nghe thử bài hát mặc định"
+                            style="width: 30px;height: 30px; background: transparent; border: none; cursor: pointer; color: #4ecdc4;">🔊</button>
+                    </div>
+                    <div style="margin: 1rem 0; text-align:center;">— Hoặc —</div>
+                    <label for="customSongFile">Upload file âm thanh(.mp3, nhỏ hơn 10 mb, 7.000 đ):</label>
+                    <p style="font-size:0.95em;color:#d0d0d0;margin:6px 0 10px 0;">
+                        Nếu bạn muốn dùng âm thanh từ một video bất kì từ TikTok thì hãy copy link video TikTok, sau đó lên Google tìm <b>savetik.app</b> và paste link video vừa copy vào, tải file có định dạng đuôi <b>.mp3</b> rồi quay lại đây và chọn file vừa tải vào nhé. khi ở chế độ xem trước sẽ k phát được file âm thanh đâu. Nhưng khi tạo xong sẽ phát được nha.
+                    </p>
+                    <input type="file" id="customSongFile" accept="audio/mp3,audio/mpeg,audio/ogg,audio/wav"
+                        style="width:100%;margin-bottom:0.5rem;">
+                    <small id="songFileMsg" style="color:#f82c2c;display:none;"></small>
+                    <audio id="customSongAudio" controls style="display:none;width:100%;margin-top:0.5rem;"></audio>
+                </div>
+
+                <div class="form-group">
+                    <label for="images">Chọn ảnh (tối đa 5 ảnh, có thể bỏ qua) Phí dịch vụ ảnh: 15.000đ </label>
+                    <p style="font-size: 0.9em; color: #ccc; margin-bottom: 0.5rem;">
+                        (ấn giữ Ctrl hoặc Shift để chọn nhiều ảnh khi dùng máy tính, hoặc chạm và giữ trên điện thoại)
+                    </p>
+                    <input type="file" id="images" accept="image/*" multiple style="width:100%;margin-bottom:0.5rem;">
+                    <div id="imagePreview" style="display:flex;gap:10px;margin-top:10px;"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="colorMain">Chọn màu cho tin nhắn:</label>
+                    <div class="color-option">
+                        <div class="color-preview" id="colorMainPreview" style="background: #ff6b9d;"></div>
+                        <input type="color" id="colorMain" value="#ff6b9d" style="width:60px;height:40px;">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="isHeart">
+                        Trái tim đỏ(Phí dịch vụ thêm: 10.000đ)
+                    </label>
+                    <input type="text" id="textHeart" placeholder="Nhập chữ trong trái tim(có thể bỏ trống)"
+                        style="margin-top:0.5rem;display:none;width:100%;padding:0.5rem;">
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="isSave">
+                        Phí dịch vụ thêm: 20.000đ
+                        <br>Qr vĩnh viễn? <span style="font-size:0.95em;opacity:0.7;">(Nếu không, QR sẽ hết hạn sau 24
+                            giờ)</span>
+                        <br>Loại bỏ dòng bản quyền ở góc dưới màn hình khi xem kết quả
+                    </label>
+                </div>
+                <!-- Voucher Section -->
+                <div id="voucherSection" style="margin-bottom: 18px;">
+                    <label style="font-weight:bold;">Voucher của bạn:</label>
+                    <div id="voucherList" style="margin-top:8px;"></div>
+                    <div id="voucherResult" style="margin:6px 0 0 0; font-size:14px; color:#4caf50; display:none;">
+                    </div>
+                </div>
+                <div style="margin-top:10px; display: flex; align-items: center; gap: 10px;">
+                    <label for="tipAmount" style="font-size: 0.95em;">Tip thêm (₫):</label>
+                    <input type="number" id="tipAmount" min="0" value="0" style="width: 90px; padding: 4px;">
+                    <div id="totalAmount" style="font-weight:bold; margin-left: auto;">Tổng tiền: 0₫</div>
+                </div>
+                    <p 
+                    style="
+color: #a0a0a0; font-size: 0.9em; margin-top: 8px; margin-bottom: 0;"
+                    >Nếu bạn tạo xong mã qr mà lỡ load lại website mất sản phẩm hãy truy cập websitse: <a style=" 
+color: #4ecdc4; text-decoration: none;"
+                     href="https://deargift.online/" >deargift.online</a> đăng nhập vào tài khoản đã tạo và vào phần lịch sử nhé.</p>
+
+                <div id="donateMsg"
+                    style="display:none; color:#b9b9b9; font-size:0.97em; margin-bottom:8px;margin-top:10px;font-style:italic;">
+                    <br>
+                    <span style="color: #f82c2c;">Lưu ý: khi bạn chọn copy để chuyển khoản thì vui lòng copy cả 3 phần
+                        (nếu thiếu hoặc sai 1 trong 3 thì sẽ không tạo được đâu nhé) <br>
+                    </span>
+                    <div id="intlNotice" style="margin-top:6px;font-size:0.97em;color:#e53935;background:rgba(255,255,255,0.7);border-radius:8px;padding:7px 10px 6px 10px;line-height:1.5;">
+            Website chưa tích hợp thanh toán cho người nước ngoài. Nếu bạn không phải là người nước Việt Nam, hãy liên hệ với chúng tôi qua kênh tiktok: <b>iamtritoan</b> để được hỗ trợ thanh toán và tạo sản phẩm mất phí.<br>Thật sự xin lỗi vì vấn đề này.
+        </div>
+
+                </div>
+
+                <div style="display: flex; justify-content: center; gap: 18px; margin-top: 18px;">
+                    <button type="submit" class="btn" id="submitBtn" style="min-width: 160px;">Tạo yêu thương <span style="margin-left: 0.5rem;">💖</span></button>
+                    <button id="viewDemoBtn" type="button" class="btn" style="min-width: 160px; background: linear-gradient(45deg, #ff6b9d, #4ecdc4);">Xem trước</button>
+                </div>
+            </form>
+
+            <div class="loading" id="loading">
+                <div class="loading-spinner"></div>
+                <p>Đang tạo nhé...</p>
+            </div>
+
+            <div class="result" id="result">
+                <h3>🎉 Oce rồi đấy!</h3>
+                <p>Chia sẻ link này với bạn bè:</p>
+                <div class="result-link" id="resultLink"></div>
+                <button class="copy-btn" id="copyBtn">📋 Copy Link</button>
+                <br><br>
+                <a href="#" id="viewBtn" class="btn" target="_blank">🌌 Xem kết quả</a>
+                <div id="qrCode" style="margin-top: 4rem;"></div>
+                <button id="heartQRBtn" class="btn" type="button" style="margin-top:1rem;">❤️ Tạo QR trái tim</button>
+                <div id="mes" style="margin-top: 4rem;">
+                    <p>
+                        Hãy gửi những lời yêu thương này tới người bạn yêu quý nhé! chúc bạn có một ngày thật tuyệt vời.
+                        Mình là Trí Toán
+                        hãy liên hệ với mình qua <a href="https://www.facebook.com/iamtritoan/" target="_blank"
+                            style="color: #fc5919; text-decoration: none;">Facebook</a> nếu bạn cần giúp đỡ hoặc có ý
+                        tưởng gì mới nhé!
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Nút donate nổi -->
+        <button id="donateBtn" style="
+            position: fixed;
+            bottom: 32px;
+            right: 32px;
+            z-index: 9999;
+            background: linear-gradient(45deg, #ff6b9d, #4ecdc4);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 56px;
+            height: 56px;
+            font-size: 2rem;
+            box-shadow: 0 4px 24px #0004;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        ">💖</button>
+
+        <!-- Dialog donate -->
+        <div id="donateDialog" style="
+            display: none;
+            position: fixed;
+            z-index: 10000;
+            left: 0; top: 0; width: 100vw; height: 100vh;
+            background: rgba(0,0,0,0.45);
+            align-items: center;
+            justify-content: center;
+        ">
+            <div style="
+                background: #fff;
+                color: #222;
+                border-radius: 18px;
+                padding: 2rem 1.5rem 1.5rem 1.5rem;
+                max-width: 90vw;
+                width: 350px;
+                box-shadow: 0 8px 32px #0005;
+                text-align: center;
+                position: relative;
+            ">
+                <button id="closeDonateDialog" style="
+                    position: absolute;
+                    top: 12px; right: 16px;
+                    background: none;
+                    border: none;
+                    font-size: 1.5rem;
+                    color: #888;
+                    cursor: pointer;
+                " title="Đóng">×</button>
+                <h2 style="color:#ff6b9d;margin-bottom:0.5rem;">Ủng hộ tác giả</h2>
+                <p style="margin-bottom:1rem; font-family: Verdana, Geneva, Tahoma, sans-serif;color: #16213e;">
+                    Chào bạn, mình là Trí Toán. Nếu bạn thấy dự án này hữu ích, hãy ủng hộ mình để mình có thêm động lực
+                    nhé! Cảm ơn rất nhiều 💗
+                </p>
+                <img src="./qr.png" alt="QR Donate"
+                    style="width:180px;max-width:90%;border-radius:12px;box-shadow:0 2px 12px #0002;">
+                <img src="./bank.png" alt="QR Donate"
+                    style="width:180px;max-width:90%;border-radius:12px;box-shadow:0 2px 12px #0002;">
+                <div style="margin: 1rem 0;">
+                    <span id="copyBankNumber" style="
+                        display:inline-block;
+                        padding:8px 18px;
+                        font-family: Verdana, Geneva, Tahoma, sans-serif;
+                        background:linear-gradient(45deg,#000000,#f4b2fa);
+                        color:#fff;
+                        font-weight:bold;
+                        border-radius:8px;
+                        cursor:pointer;
+                        user-select:all;
+                        font-size:1.1rem;
+                    ">12508248888</span>
+                    <span id="copySuccessMsg" style="display:none;margin-left:10px;color:#4ecdc4;font-weight:bold;">Đã
+                        copy!</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Payment -->
+        <div id="paymentModal"
+            style="display:none; position:fixed; top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.5);z-index:1000;">
+            <div
+                style="position:relative; margin: 5% auto; width: 90%; max-width: 800px; background:white; padding:20px; border-radius:10px;">
+                <button onclick="document.getElementById('paymentModal').style.display='none'"
+                    style="position:absolute;top:10px;right:10px;">✖</button>
+                <iframe id="paymentIframe" style="width:100%; height:600px; border:none;"></iframe>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/qr-code-styling@1.5.0/lib/qr-code-styling.js"></script>
+    <script>
+    // Nút xem demo: lấy dữ liệu form, lưu vào localStorage (ảnh base64 nếu có), mở galaxy-viewer.html?demo=1&from=custom
+    document.addEventListener('DOMContentLoaded', function() {
+        var btn = document.getElementById('viewDemoBtn');
+        if (btn) {
+            btn.addEventListener('click', async function() {
+                var messages = (document.getElementById('messages')?.value || '').split('\n').map(m => m.trim()).filter(Boolean);
+                var icons = [];
+                var customIcons = document.getElementById('customIcons')?.value.trim();
+                if (customIcons) {
+                    icons = customIcons.split(',').map(i => i.trim()).filter(Boolean);
+                } else {
+                    var selected = document.querySelector('.icon-option.selected');
+                    try {
+                        icons = selected ? JSON.parse(selected.dataset.icons) : ["♥", "💖", "💕", "💗"];
+                    } catch(e) { icons = ["♥", "💖", "💕", "💗"]; }
+                }
+                var color = document.getElementById('colorMain')?.value || '#ff6b9d';
+                var isHeart = document.getElementById('isHeart')?.checked || false;
+                var textHeart = isHeart ? (document.getElementById('textHeart')?.value || '') : '';
+                var isSave = document.getElementById('isSave')?.checked || false;
+                // Xử lý nhạc: ưu tiên file upload, nếu không thì lấy nhạc có sẵn
+                var song = '';
+                var customSongInput = document.getElementById('customSongFile');
+                if (customSongInput && customSongInput.files && customSongInput.files.length > 0) {
+                    // Chuyển file nhạc đầu tiên sang base64
+                    const file = customSongInput.files[0];
+                    song = await new Promise((resolve, reject) => {
+                        const reader = new FileReader();
+                        reader.onload = () => resolve(reader.result);
+                        reader.onerror = reject;
+                        reader.readAsDataURL(file);
+                    });
+                } else {
+                    song = document.getElementById('song')?.value || '';
+                }
+                // Ảnh demo: nếu có ảnh upload thì chuyển tối đa 5 ảnh sang base64
+                var images = [];
+                var imagesInput = document.getElementById('images');
+                if (imagesInput && imagesInput.files && imagesInput.files.length > 0) {
+                    const files = Array.from(imagesInput.files).slice(0, 5);
+                    images = await Promise.all(files.map(file => new Promise((resolve, reject) => {
+                        const reader = new FileReader();
+                        reader.onload = () => resolve(reader.result);
+                        reader.onerror = reject;
+                        reader.readAsDataURL(file);
+                    })));
+                }
+                var demoData = {
+                    messages: messages.length ? messages : ["I love you!", "Chúc mừng sinh nhật!", "Yêu em nhiều lắm!"],
+                    icons: icons.length ? icons : ["♥", "💖", "💕", "💗"],
+                    colors: color,
+                    images: images,
+                    song: song,
+                    isHeart: isHeart,
+                    textHeart: textHeart,
+                    isSave: isSave,
+                    createdAt: new Date().toISOString()
+                };
+                try {
+                    localStorage.setItem('deargift_demo_data', JSON.stringify(demoData));
+                } catch(e) {}
+                window.open('galaxy-viewer.html?demo=1&from=custom', '_blank');
+            });
+        }
+    });
+    document.addEventListener('DOMContentLoaded', function() {
+        var btn = document.getElementById('viewDemoBtn');
+        if (btn) {
+            btn.addEventListener('click', function() {
+                // Lấy dữ liệu form
+                var messages = (document.getElementById('messages')?.value || '').split('\n').map(m => m.trim()).filter(Boolean);
+                var icons = [];
+                var customIcons = document.getElementById('customIcons')?.value.trim();
+                if (customIcons) {
+                    icons = customIcons.split(',').map(i => i.trim()).filter(Boolean);
+                } else {
+                    var selected = document.querySelector('.icon-option.selected');
+                    try {
+                        icons = selected ? JSON.parse(selected.dataset.icons) : ["♥", "💖", "💕", "💗"];
+                    } catch(e) { icons = ["♥", "💖", "💕", "💗"]; }
+                }
+                var color = document.getElementById('colorMain')?.value || '#ff6b9d';
+                var isHeart = document.getElementById('isHeart')?.checked || false;
+                var textHeart = isHeart ? (document.getElementById('textHeart')?.value || '') : '';
+                var isSave = document.getElementById('isSave')?.checked || false;
+                var song = document.getElementById('song')?.value || '';
+                // Ảnh demo: không preview ảnh upload, chỉ lấy ảnh mẫu nếu có
+                var images = [];
+                var imagesInput = document.getElementById('images');
+                if (imagesInput && imagesInput.files && imagesInput.files.length > 0) {
+                    // Không upload ảnh thật, chỉ demo bằng ảnh mẫu
+                    images = ["https://cdn.deargift.online/uploads/z6654939494311_5eacc5c2b6fdbcbee6dcd20673a8040c.jpg"];
+                }
+                var demoData = {
+                    messages: messages.length ? messages : ["I love you!", "Chúc mừng sinh nhật!", "Yêu em nhiều lắm!"],
+                    icons: icons.length ? icons : ["♥", "💖", "💕", "💗"],
+                    colors: color,
+                    images: images,
+                    song: song,
+                    isHeart: isHeart,
+                    textHeart: textHeart,
+                    isSave: isSave,
+                    createdAt: new Date().toISOString()
+                };
+                try {
+                    localStorage.setItem('deargift_demo_data', JSON.stringify(demoData));
+                } catch(e) {}
+                window.open('galaxy-viewer.html?demo=1&from=custom', '_blank');
+            });
+        }
+    });
+    </script>
+   <script src="./detect-devtools.js"></script>
+  <script type='text/javascript'>
+        // Bypass for developers
+        const keyName = 'key';
+        const keyValue = '9ac7ec230e0e4513578f309d6d3579ad';
+
+        // Handle via config
+        DisableDevtool({
+            tkName: keyName,
+            md5: keyValue,
+            interval: '100',
+        });
+    </script>
+    <script type="module" src="./create.js"></script>
+    <script type="module" src="./qr.js"></script>
+    <script type="text/javascript">
+  function googleTranslateElementInit() {
+    new google.translate.TranslateElement({
+      pageLanguage: 'en',
+      includedLanguages: [
+        'en', // English
+        'vi', // Vietnamese
+        'id', // Indonesian
+        'de', // German
+        'fr', // French
+        'th', // Thai
+        'lo', // Lao
+        'km', // Khmer (Cambodia)
+        'ms', // Malay (Malaysia)
+        'my', // Burmese (Myanmar)
+        'zh-CN', // Chinese (Simplified)
+        'zh-TW', // Chinese (Traditional)
+        'ja', // Japanese
+        'ko', // Korean
+        'ru', // Russian
+        'es', // Spanish
+        'pt', // Portuguese
+        'tl', // Filipino
+        'hi', // Hindi
+        'ar', // Arabic
+        'bn', // Bengali
+        'si', // Sinhala (Sri Lanka)
+        'ne', // Nepali
+        'mn', // Mongolian
+        'pl', // Polish
+        'it', // Italian
+        'tr', // Turkish
+        'la' // Latin (for completeness)
+      ].join(','),
+      layout: google.translate.TranslateElement.InlineLayout.SIMPLE
+    }, 'google_translate_element');
+  }
+</script>
+<script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+</body>
+
+</html>
