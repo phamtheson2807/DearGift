@@ -5,7 +5,7 @@ const firebaseConfig = {
   apiKey: "AIzaSyDsQzklj9EplxSPFltI3kRVjzIu8DILwko",
   authDomain: "deargift-f780b.firebaseapp.com",
   projectId: "deargift-f780b",
-  storageBucket: "deargift-f780b.appspot.com",
+  storageBucket: "deargift-f780b.firebasestorage.app",
   messagingSenderId: "329430119253",
   appId: "1:329430119253:web:71a099c215370092eeb5dc",
   measurementId: "G-NSJHP66HKW",
@@ -260,32 +260,43 @@ function selectSong(song, element) {
 
 // Handle demo preview functionality (integrated from create.html)
 async function handleDemoPreview() {
-  const messageInput = document.getElementById("message");
+  const messageInput = document.getElementById("messages");
   if (!messageInput) return;
   
   const userMessage = messageInput.value.trim();
   
-  // Check for music input (both types)
-  const musicFile = document.getElementById('backgroundMusic')?.files[0] || 
-                    document.getElementById('customSongFile')?.files[0];
+  // Get music with priority logic (same as form submission)
+  let musicUrl = null;
   
-  let musicBase64 = null;
-  
-  if (musicFile) {
-    try {
-      // Convert to base64 for demo mode
-      musicBase64 = await new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => {
-          const base64 = reader.result;
-          resolve(base64);
-        };
-        reader.onerror = reject;
-        reader.readAsDataURL(musicFile);
-      });
-    } catch (error) {
-      console.warn("Couldn't convert music for demo:", error);
-      // Continue without music
+  // Priority 1: Check if custom music file was uploaded via the uploader
+  if (uploadedMusicFile && uploadedMusicFile.url) {
+    musicUrl = uploadedMusicFile.url;
+    console.log('Demo using uploaded music file:', uploadedMusicFile);
+  } 
+  // Priority 2: Check if a preset song is selected
+  else if (selectedSong) {
+    musicUrl = selectedSong.url;
+    console.log('Demo using preset song:', selectedSong);
+  } 
+  // Priority 3: Fallback to legacy file input (for backward compatibility)
+  else {
+    const musicFile = document.getElementById('backgroundMusic')?.files[0] || 
+                      document.getElementById('customSongFile')?.files[0];
+    
+    if (musicFile) {
+      try {
+        // Convert to base64 for demo mode
+        musicUrl = await new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result);
+          reader.onerror = reject;
+          reader.readAsDataURL(musicFile);
+        });
+        console.log('Demo using legacy file input as base64');
+      } catch (error) {
+        console.warn("Couldn't convert music for demo:", error);
+        musicUrl = null;
+      }
     }
   }
   
@@ -296,13 +307,20 @@ async function handleDemoPreview() {
     message: userMessage || 'Welcome to your galaxy preview!',
     creator: 'Demo User',
     createdAt: new Date().toISOString(),
-    musicUrl: musicBase64 || null,
+    musicUrl: musicUrl,
     musicVolume: 0.5,
     isDemo: true
   };
   
   // Store in localStorage temporarily for demo
   localStorage.setItem('temp_demo_galaxy', JSON.stringify(demoData));
+  
+  // Show toast notification
+  if (musicUrl) {
+    showToast('🎵 Mở demo với nhạc của bạn!');
+  } else {
+    showToast('👁️ Mở demo (không có nhạc)');
+  }
   
   // Open demo in new tab
   const demoUrl = `index.html?demo=1&tempId=${demoData.id}`;
@@ -805,19 +823,55 @@ async function saveGalaxyData(id, data) {
   localStorage.setItem("deargift_galaxies", JSON.stringify(existingData));
 
   // Debug log
-  console.log("Galaxy saved with ID:", id);
+  console.log("Galaxy saved to localStorage with ID:", id);
   console.log("Galaxy data:", data);
 
-  // Lưu lên Firestore (đảm bảo luôn lưu, không chỉ thử/catch)
+  // Lưu lên Firestore (với error handling tốt hơn)
   try {
+    // Kiểm tra kết nối Firebase trước
+    if (!firebase.apps.length) {
+      throw new Error('Firebase app not initialized');
+    }
+    
+    if (!db) {
+      throw new Error('Firestore not available');
+    }
+    
+    // Test Firestore connection
+    console.log('Testing Firestore connection...');
     await db.collection("galaxies").doc(id).set(data);
-    console.log("Galaxy saved to Firestore:", id);
+    console.log("✅ Galaxy saved to Firestore successfully:", id);
+    
+    // Show success message
+    showToast("✅ Galaxy đã được lưu lên server thành công!");
+    
   } catch (error) {
-    // Nếu lỗi Firestore, vẫn cho phép local dùng được, nhưng cảnh báo rõ ràng
-    alert(
-      "Lưu lên server thất bại, chỉ lưu tạm trên máy bạn. Vui lòng thử lại hoặc kiểm tra kết nối mạng!"
-    );
     console.error("Error saving to Firestore:", error);
+    
+    // Provide specific error messages
+    let errorMessage = "Lưu lên server thất bại. ";
+    
+    if (error.code === 'permission-denied') {
+      errorMessage += "Không có quyền truy cập Firestore. ";
+    } else if (error.code === 'unavailable') {
+      errorMessage += "Server tạm thời không khả dụng. ";
+    } else if (error.message.includes('network')) {
+      errorMessage += "Lỗi kết nối mạng. ";
+    } else {
+      errorMessage += `Lỗi: ${error.message}. `;
+    }
+    
+    errorMessage += "Galaxy đã được lưu tạm trên máy bạn và vẫn có thể sử dụng.";
+    
+    // Show user-friendly error message
+    showToast(`⚠️ ${errorMessage}`, 'warning');
+    
+    // Log detailed error for debugging
+    console.error("Detailed Firestore error:", {
+      code: error.code,
+      message: error.message,
+      stack: error.stack
+    });
   }
 
   // Also save metadata for listing (local)
@@ -967,14 +1021,23 @@ function createNew() {
 }
 
 // Show toast notification
-function showToast(message) {
+function showToast(message, type = 'success') {
   // Create toast element
   const toast = document.createElement("div");
+  
+  // Set colors based on type
+  let backgroundColor = '#4ecdc4'; // default success color
+  if (type === 'warning') {
+    backgroundColor = '#ff9800';
+  } else if (type === 'error') {
+    backgroundColor = '#f44336';
+  }
+  
   toast.style.cssText = `
         position: fixed;
         top: 20px;
         right: 20px;
-        background: #4ecdc4;
+        background: ${backgroundColor};
         color: white;
         padding: 15px 20px;
         border-radius: 10px;
@@ -984,6 +1047,8 @@ function showToast(message) {
         box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         transform: translateX(100%);
         transition: transform 0.3s ease;
+        max-width: 350px;
+        word-wrap: break-word;
     `;
   toast.textContent = message;
 
@@ -994,13 +1059,16 @@ function showToast(message) {
     toast.style.transform = "translateX(0)";
   }, 100);
 
-  // Remove after 3 seconds
+  // Remove after longer time for warnings/errors
+  const duration = type === 'warning' || type === 'error' ? 5000 : 3000;
   setTimeout(() => {
     toast.style.transform = "translateX(100%)";
     setTimeout(() => {
-      document.body.removeChild(toast);
+      if (document.body.contains(toast)) {
+        document.body.removeChild(toast);
+      }
     }, 300);
-  }, 3000);
+  }, duration);
 }
 
 // Initialize icons display on page load
