@@ -1,0 +1,14 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Allow read and write access to galaxies collection
+    match /galaxies/{document} {
+      allow read, write: if true;
+    }
+    
+    // Allow read and write access to any collection (for development)
+    match /{document=**} {
+      allow read, write: if true;
+    }
+  }
+}
