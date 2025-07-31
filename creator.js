@@ -635,46 +635,23 @@ async function getFormData() {
   const enableHeart = document.getElementById("enableHeart").checked;
   const hideFooter = document.getElementById("hideFooter").checked;
 
-  // Handle music selection with priority order
+  // Luôn chỉ lấy link nhạc (URL), không lưu base64 vào Firestore
   let musicData = null;
-  
-  // Priority 1: Check if custom music file was uploaded via the uploader
+  // Ưu tiên: uploader custom (Firebase hoặc web khác) -> preset -> nhập tay
   if (uploadedMusicFile && uploadedMusicFile.url) {
     musicData = uploadedMusicFile.url;
     console.log('Using uploaded music file:', uploadedMusicFile);
-  } 
-  // Priority 2: Check if a preset song is selected
-  else if (selectedSong) {
+  } else if (selectedSong) {
     musicData = selectedSong.url;
     console.log('Using preset song:', selectedSong);
-  } 
-  // Priority 3: Fallback to legacy file input (for backward compatibility)
-  else {
-    const musicFile = document.getElementById("backgroundMusic").files[0];
-    if (musicFile) {
-      // Check file size before converting to base64
-      const maxSizeForFirestore = 500 * 1024; // 500KB limit for Firestore
-      
-      if (musicFile.size > maxSizeForFirestore) {
-        console.warn(`Music file too large for Firestore (${(musicFile.size / 1024).toFixed(1)}KB), skipping music for server save`);
-        // For large files, only use for demo/local - don't save to Firestore
-        showToast(`⚠️ File nhạc quá lớn (${(musicFile.size / 1024 / 1024).toFixed(1)}MB), chỉ hoạt động local`, 'warning');
-        musicData = null; // Don't include in Firestore data
-      } else {
-        // For smaller files: convert to base64
-        try {
-          musicData = await new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onload = () => resolve(reader.result);
-            reader.onerror = reject;
-            reader.readAsDataURL(musicFile);
-          });
-          console.log('Using legacy file input as base64 (small file)');
-        } catch (error) {
-          console.error('Error converting music file to base64:', error);
-          musicData = null;
-        }
-      }
+  } else {
+    // Cho phép nhập link nhạc thủ công nếu không upload được
+    const manualMusicUrl = document.getElementById('manualMusicUrl');
+    if (manualMusicUrl && manualMusicUrl.value.trim()) {
+      musicData = manualMusicUrl.value.trim();
+      console.log('Using manual music URL:', musicData);
+    } else {
+      musicData = null;
     }
   }
 
@@ -795,61 +772,64 @@ async function handleEnhancedMusicUpload(e) {
   uploadStatus.innerHTML = '⏳ Chuẩn bị upload nhạc...';
   
   try {
-    const result = await handleSmartMusicUpload(file, (progress) => {
-      uploadStatus.innerHTML = `📤 Đang upload nhạc (${progress.toFixed(1)}%)...`;
-    });
-    
-    // Store uploaded music info globally
-    uploadedMusicFile = result;
-    
-    // Clear preset selection when uploading custom music
+    // Tự động upload lên Firebase Storage và lấy link
+    const url = await uploadMusicAndGetUrl(file, uploadStatus);
+    if (!url) throw new Error('Không lấy được link nhạc!');
+    uploadedMusicFile = {
+      url: url,
+      originalName: file.name,
+      size: file.size,
+      type: file.type,
+      isFirebaseUpload: true,
+      uploadedAt: new Date().toISOString()
+    };
+    // Clear preset selection khi upload custom
     selectedSong = null;
     const allSongItems = document.querySelectorAll('.song-item');
     allSongItems.forEach(item => item.classList.remove('selected'));
-    
-    console.log('Enhanced music upload completed:', result);
-    
-    // Show success message with detailed info
-    let uploadType = 'Firebase Storage';
-    let statusColor = '#4CAF50';
-    let extraInfo = '';
-    
-    if (result.isFirebaseUpload) {
-      uploadType = 'Firebase Storage';
-      extraInfo = ' (Permanent link)';
-    } else if (result.isBlobUpload) {
-      uploadType = 'Local (Development)';
-      extraInfo = ' (Temp link - only for this session)';
-      statusColor = '#ff9800';
-    } else if (result.isBase64) {
-      uploadType = 'Base64 (Demo)';
-      extraInfo = ' (For demo only)';
-      statusColor = '#ff9800';
-    }
-    
-    uploadStatus.innerHTML = `✅ Upload thành công via ${uploadType}: ${result.originalName} (${(result.size / 1024 / 1024).toFixed(2)}MB)${extraInfo}`;
-    uploadStatus.style.color = statusColor;
-    
-    // Show additional warning for non-Firebase uploads
-    if (!result.isFirebaseUpload) {
-      setTimeout(() => {
-        if (result.isBlobUpload) {
-          showToast(`⚠️ Firebase Storage bị chặn (CORS), dùng Blob URL. Nhạc hoạt động bình thường nhưng chỉ trong session này!`, 'warning');
-        } else {
-          showToast(`⚠️ Firebase Storage không khả dụng, sử dụng ${uploadType}. Nhạc vẫn hoạt động bình thường!`, 'warning');
-        }
-      }, 1000);
-    }
-    
+    uploadStatus.innerHTML = `✅ Upload thành công: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)}MB)`;
+    uploadStatus.style.color = '#4CAF50';
+    setTimeout(() => {
+      if (uploadedMusicFile.url && typeof window.previewMusic === 'function') {
+        window.previewMusic(uploadedMusicFile.url, uploadedMusicFile.originalName);
+      }
+    }, 500);
   } catch (error) {
     console.error('Enhanced music upload error:', error);
     uploadStatus.innerHTML = `❌ Upload thất bại: ${error.message}`;
     uploadStatus.style.color = '#f44336';
     uploadedMusicFile = null;
-    
-    // Show detailed error help
     showToast(`❌ Upload nhạc thất bại: ${error.message}. Thử file nhỏ hơn hoặc chọn nhạc có sẵn.`, 'error');
   }
+// Hàm upload nhạc lên Firebase Storage và lấy link
+async function uploadMusicAndGetUrl(file, statusEl) {
+  if (!file || !file.type.startsWith('audio/')) {
+    alert('Vui lòng chọn file nhạc hợp lệ!');
+    return null;
+  }
+  try {
+    const storageRef = firebase.storage().ref();
+    const musicRef = storageRef.child('music/' + Date.now() + '_' + file.name);
+    // Upload file
+    const uploadTask = musicRef.put(file);
+    return await new Promise((resolve, reject) => {
+      uploadTask.on('state_changed', function(snapshot) {
+        if (statusEl) {
+          const percent = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          statusEl.innerHTML = `📤 Đang upload nhạc (${percent.toFixed(1)}%)...`;
+        }
+      }, function(error) {
+        reject(error);
+      }, function() {
+        uploadTask.snapshot.ref.getDownloadURL().then(resolve).catch(reject);
+      });
+    });
+  } catch (err) {
+    console.error('Lỗi upload nhạc:', err);
+    alert('Upload thất bại: ' + err.message);
+    return null;
+  }
+}
 }
 
 // Save galaxy data
