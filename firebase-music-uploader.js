@@ -92,9 +92,26 @@ class FirebaseMusicUploader {
             const uploadTask = musicRef.put(file);
             
             return new Promise((resolve, reject) => {
+                let progressReceived = false;
+                let timeoutId;
+                
+                // Set timeout to detect CORS issues quickly
+                timeoutId = setTimeout(() => {
+                    if (!progressReceived) {
+                        console.warn('Firebase upload timeout - no progress received, likely CORS issue');
+                        reject(new Error('Upload timeout - likely CORS or network issue'));
+                    }
+                }, 3000); // 3 second timeout
+                
                 uploadTask.on('state_changed',
                     // Progress function
                     (snapshot) => {
+                        progressReceived = true;
+                        if (timeoutId) {
+                            clearTimeout(timeoutId);
+                            timeoutId = null;
+                        }
+                        
                         const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
                         console.log('Upload progress:', progress.toFixed(2) + '%');
                         
@@ -104,11 +121,18 @@ class FirebaseMusicUploader {
                     },
                     // Error function
                     (error) => {
+                        if (timeoutId) {
+                            clearTimeout(timeoutId);
+                        }
                         console.error('Upload error:', error);
                         reject(error);
                     },
                     // Complete function
                     async () => {
+                        if (timeoutId) {
+                            clearTimeout(timeoutId);
+                        }
+                        
                         try {
                             console.log('Upload completed successfully');
                             

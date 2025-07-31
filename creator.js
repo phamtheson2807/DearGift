@@ -833,7 +833,11 @@ async function handleEnhancedMusicUpload(e) {
     // Show additional warning for non-Firebase uploads
     if (!result.isFirebaseUpload) {
       setTimeout(() => {
-        showToast(`⚠️ Firebase Storage không khả dụng, sử dụng ${uploadType}. Nhạc vẫn hoạt động bình thường!`, 'warning');
+        if (result.isBlobUpload) {
+          showToast(`⚠️ Firebase Storage bị chặn (CORS), dùng Blob URL. Nhạc hoạt động bình thường nhưng chỉ trong session này!`, 'warning');
+        } else {
+          showToast(`⚠️ Firebase Storage không khả dụng, sử dụng ${uploadType}. Nhạc vẫn hoạt động bình thường!`, 'warning');
+        }
       }, 1000);
     }
     

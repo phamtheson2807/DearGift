@@ -3,6 +3,7 @@ class SmartMusicUploader {
     constructor() {
         this.isDevelopment = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
         this.firebaseUploader = null;
+        this.firebaseDisabled = false; // Flag to disable Firebase after CORS issues
         this.initializeUploader();
     }
 
@@ -18,6 +19,7 @@ class SmartMusicUploader {
             }
         } catch (error) {
             console.warn('Firebase Storage not available, will use Blob URLs as fallback:', error);
+            this.firebaseDisabled = true;
         }
     }
 
@@ -25,6 +27,12 @@ class SmartMusicUploader {
         try {
             // Validate file first
             this.validateMusicFile(file);
+            
+            // Check if Firebase is disabled due to previous CORS issues
+            if (this.firebaseDisabled) {
+                console.log('Firebase Storage disabled due to previous CORS issues, using Blob URL...');
+                return await this.uploadAsBlob(file, progressCallback);
+            }
             
             // Always try Firebase Storage first for permanent links
             if (this.firebaseUploader && this.firebaseUploader.isInitialized) {
@@ -44,10 +52,16 @@ class SmartMusicUploader {
                         firebaseError.message.includes('access control') ||
                         firebaseError.message.includes('preflight') ||
                         firebaseError.message.includes('HTTP ok status') ||
+                        firebaseError.message.includes('timeout') ||
+                        firebaseError.message.includes('network issue') ||
                         firebaseError.code === 'storage/unauthorized' ||
                         firebaseError.code === 'storage/unknown' ||
                         firebaseError.code === 'storage/invalid-url') {
-                        console.log('Firebase/CORS/Network issue detected, falling back to Blob URL...');
+                        console.log('Firebase/CORS/Network issue detected, disabling Firebase and falling back to Blob URL...');
+                        
+                        // Disable Firebase for future uploads in this session
+                        this.firebaseDisabled = true;
+                        
                         return await this.uploadAsBlob(file, progressCallback);
                     } else {
                         throw firebaseError;
