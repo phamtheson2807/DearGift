@@ -1,0 +1,74 @@
+{
+  "vietnamese_alternatives": {
+    "love_songs": [
+      {
+        "original": "Anh Là Của Em - Karik ft. Lou Hoàng",
+        "alternative_sources": [
+          {
+            "type": "YouTube Cover",
+            "search": "Anh Là Của Em piano cover instrumental",
+            "example_url": "https://www.youtube.com/results?search_query=anh+la+cua+em+piano+cover"
+          },
+          {
+            "type": "SoundCloud Remix",
+            "search": "Anh Là Của Em remix free download",
+            "example_url": "https://soundcloud.com/search?q=anh%20la%20cua%20em"
+          }
+        ]
+      },
+      {
+        "original": "Em Của Ngày Hôm Qua - Sơn Tùng M-TP",
+        "alternative_sources": [
+          {
+            "type": "Instrumental Version",
+            "search": "Em Của Ngày Hôm Qua instrumental karaoke",
+            "example_url": "https://www.youtube.com/results?search_query=em+cua+ngay+hom+qua+instrumental"
+          }
+        ]
+      }
+    ],
+    "free_vietnamese_music": [
+      {
+        "artist": "Nguyễn Hải Phong",
+        "status": "Creative Commons",
+        "source": "https://soundcloud.com/nguyen-hai-phong",
+        "note": "Nhạc sĩ chia sẻ miễn phí"
+      },
+      {
+        "artist": "Various Vietnamese Indie",
+        "source": "https://bandcamp.com/tag/vietnamese",
+        "note": "Nhạc indie Việt miễn phí"
+      }
+    ]
+  },
+  "download_methods": {
+    "youtube_to_mp3": {
+      "tools": [
+        "yt-dlp (Command line)",
+        "4K Video Downloader",
+        "Online converters (y2mate.com)"
+      ],
+      "steps": [
+        "1. Tìm bài hát trên YouTube",
+        "2. Copy URL video",
+        "3. Dán vào tool converter", 
+        "4. Download file MP3",
+        "5. Rename và upload vào project"
+      ]
+    },
+    "soundcloud_download": {
+      "tools": [
+        "SoundCloud Downloader",
+        "Browser extensions"
+      ],
+      "note": "Chỉ download nhạc có license cho phép"
+    }
+  },
+  "recommended_workflow": {
+    "step1": "Tìm instrumental/cover version trên YouTube",
+    "step2": "Kiểm tra license (Creative Commons preferred)",
+    "step3": "Download bằng yt-dlp hoặc online tool",
+    "step4": "Convert và optimize file (< 5MB)",
+    "step5": "Upload vào folder songs/ và cập nhật playlist.json"
+  }
+}

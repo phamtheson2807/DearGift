@@ -1,0 +1,19 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Allow uploads to music folder
+    match /music/{allPaths=**} {
+      allow read, write: if true; // Allow anyone to upload and read music files
+    }
+    
+    // Allow uploads to uploads folder (temporary files)
+    match /uploads/{allPaths=**} {
+      allow read, write: if true; // Allow anyone to upload and read uploaded files
+    }
+    
+    // Default deny all other paths
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Music Upload</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #000;
+            color: white;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ff6b9d;
+            border-radius: 10px;
+        }
+        button {
+            background: #ff6b9d;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        input[type="file"] {
+            margin: 10px 0;
+        }
+        .result {
+            margin-top: 10px;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test Music Upload & Playback</h1>
+
+    <div class="test-section">
+        <h2>1. Upload Music File</h2>
+        <input type="file" id="musicFile" accept="audio/*">
+        <button onclick="testUpload()">Upload & Test</button>
+        <div id="uploadResult" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>2. Create Galaxy with Music</h2>
+        <button onclick="testGalaxyCreation()">Create Test Galaxy</button>
+        <div id="galaxyResult" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>3. Music Control Test</h2>
+        <audio id="testAudio" controls style="width: 100%; margin: 10px 0;"></audio>
+        <button onclick="testMusicControl()">Test Music Control Button</button>
+        <div id="controlResult" class="result"></div>
+        
+        <!-- Music Control Button (same as in index.html) -->
+        <div id="musicControlBtn" style="
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1001;
+            background: rgba(255, 107, 157, 0.9);
+            border: none;
+            border-radius: 50px;
+            padding: 12px 16px;
+            color: white;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 20px rgba(255, 107, 157, 0.4);
+            transition: all 0.3s ease;
+        " onclick="toggleMusic()">
+            <span id="musicIcon">🎵</span>
+            <span id="musicText">Phát nhạc</span>
+        </div>
+    </div>
+
+    <script>
+        let uploadedMusicUrl = null;
+
+        // Test upload functionality
+        function testUpload() {
+            const fileInput = document.getElementById('musicFile');
+            const result = document.getElementById('uploadResult');
+            
+            if (!fileInput.files[0]) {
+                result.innerHTML = '<span style="color: red;">Vui lòng chọn file nhạc!</span>';
+                return;
+            }
+            
+            const file = fileInput.files[0];
+            result.innerHTML = `
+                <strong>File đã chọn:</strong><br>
+                - Tên: ${file.name}<br>
+                - Kích thước: ${(file.size / 1024 / 1024).toFixed(2)} MB<br>
+                - Loại: ${file.type}<br>
+                <span style="color: green;">✓ Upload thành công!</span>
+            `;
+            
+            // Create blob URL for testing
+            uploadedMusicUrl = URL.createObjectURL(file);
+            console.log('Uploaded music URL:', uploadedMusicUrl);
+        }
+
+        // Test galaxy creation
+        function testGalaxyCreation() {
+            const result = document.getElementById('galaxyResult');
+            
+            if (!uploadedMusicUrl) {
+                result.innerHTML = '<span style="color: red;">Vui lòng upload nhạc trước!</span>';
+                return;
+            }
+            
+            // Simulate galaxy creation with music
+            const galaxyData = {
+                messages: ["Test message"],
+                icons: ["❤️"],
+                colors: '#ff6b9d',
+                images: [""],
+                song: uploadedMusicUrl,
+                isHeart: true,
+                textHeart: "Test",
+                isSave: true,
+                createdAt: new Date().toISOString()
+            };
+            
+            // Save to localStorage for testing
+            const galaxyId = 'test-' + Date.now();
+            localStorage.setItem('deargift_galaxies', JSON.stringify({
+                [galaxyId]: galaxyData
+            }));
+            
+            result.innerHTML = `
+                <span style="color: green;">✓ Galaxy tạo thành công!</span><br>
+                <strong>Galaxy ID:</strong> ${galaxyId}<br>
+                <strong>Music URL:</strong> ${uploadedMusicUrl}<br>
+                <a href="index.html?id=${galaxyId}" target="_blank" style="color: #ff6b9d;">
+                    🚀 Xem Galaxy với nhạc
+                </a>
+            `;
+        }
+
+        // Test music control
+        function testMusicControl() {
+            const audio = document.getElementById('testAudio');
+            const musicBtn = document.getElementById('musicControlBtn');
+            const result = document.getElementById('controlResult');
+            
+            if (!uploadedMusicUrl) {
+                result.innerHTML = '<span style="color: red;">Vui lòng upload nhạc trước!</span>';
+                return;
+            }
+            
+            // Set audio source
+            audio.src = uploadedMusicUrl;
+            audio.load();
+            
+            // Show music control button
+            musicBtn.style.display = 'flex';
+            
+            result.innerHTML = `
+                <span style="color: green;">✓ Music control đã được thiết lập!</span><br>
+                <strong>Audio source:</strong> ${uploadedMusicUrl}<br>
+                <strong>Nút control:</strong> Hiển thị ở góc phải dưới<br>
+                <em>Click nút 🎵 để test phát nhạc</em>
+            `;
+        }
+
+        // Music control function (same as in index.html)
+        function toggleMusic() {
+            const audio = document.getElementById('testAudio');
+            const musicBtn = document.getElementById('musicControlBtn');
+            const musicIcon = document.getElementById('musicIcon');
+            const musicText = document.getElementById('musicText');
+            
+            if (!audio.src) {
+                console.log('No audio source available');
+                return;
+            }
+            
+            if (audio.paused) {
+                audio.muted = false;
+                audio.play().then(function() {
+                    console.log('Music started playing');
+                    musicBtn.classList.add('playing');
+                    musicBtn.style.background = 'rgba(67, 255, 107, 0.9)';
+                    musicIcon.innerHTML = '🎶';
+                    musicText.innerHTML = 'Đang phát';
+                }).catch(function(error) {
+                    console.error('Audio play error:', error);
+                    musicBtn.style.background = 'rgba(220, 53, 69, 0.9)';
+                    musicIcon.innerHTML = '🔇';
+                    musicText.innerHTML = 'Lỗi phát nhạc';
+                });
+            } else {
+                audio.pause();
+                musicBtn.classList.remove('playing');
+                musicBtn.style.background = 'rgba(255, 107, 157, 0.9)';
+                musicIcon.innerHTML = '🎵';
+                musicText.innerHTML = 'Phát nhạc';
+            }
+        }
+
+        // Auto-test with demo music
+        window.onload = function() {
+            // Create a demo audio for testing
+            setTimeout(function() {
+                // Try to load a demo audio file if available
+                fetch('songs/anh_la_cua_em.mp4')
+                    .then(response => {
+                        if (response.ok) {
+                            uploadedMusicUrl = 'songs/anh_la_cua_em.mp4';
+                            document.getElementById('uploadResult').innerHTML = `
+                                <span style="color: blue;">📀 Demo music loaded: anh_la_cua_em.mp4</span>
+                            `;
+                        }
+                    })
+                    .catch(e => {
+                        console.log('No demo music available');
+                    });
+            }, 1000);
+        };
+    </script>
+</body>
+</html>

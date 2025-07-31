@@ -1,0 +1,67 @@
+{
+  "love_songs": [
+    {
+      "id": "love1",
+      "name": "Anh Là Của Em - Karik ft. Lou Hoàng (Cover)",
+      "url": "./songs/anh_la_cua_em.mp4",
+      "category": "love",
+      "duration": "4:05",
+      "note": "Tải từ YouTube cover version"
+    },
+    {
+      "id": "love2", 
+      "name": "Yêu Là Tha Thu - Onlyc ft. Karik (Cover)",
+      "url": "./songs/yeu_la_tha_thu.mp4",
+      "category": "love",
+      "duration": "4:23"
+    },
+    {
+      "id": "love3",
+      "name": "Có Chàng Trai Viết Lên Cây - Phan Mạnh Quỳnh (Piano Cover)",
+      "url": "./songs/co_chang_trai_viet_len_cay.mp4",
+      "category": "love",
+      "duration": "3:44"
+    }
+  ],
+  "birthday_songs": [
+    {
+      "id": "birthday1",
+      "name": "Chúc Mừng Sinh Nhật (Instrumental)",
+      "url": "./songs/chuc_mung_sinh_nhat.mp4",
+      "category": "birthday",
+      "duration": "3:30"
+    }
+  ],
+  "instrumental": [
+    {
+      "id": "inst1",
+      "name": "Piano Acoustic Cover",
+      "url": "./songs/co_chang_trai_viet_len_cay.mp4",
+      "category": "instrumental",
+      "duration": "3:44",
+      "note": "Piano version có thể dùng như instrumental"
+    }
+  ],
+  "trending": [
+    {
+      "id": "trend1",
+      "name": "Anh Là Của Em (Popular Cover)",
+      "url": "./songs/anh_la_cua_em.mp4",
+      "category": "trending",
+      "duration": "4:05"
+    },
+    {
+      "id": "trend2",
+      "name": "Yêu Là Tha Thu (Trending)",
+      "url": "./songs/yeu_la_tha_thu.mp4",
+      "category": "trending",
+      "duration": "4:23"
+    }
+  ],
+  "user_uploads": {
+    "note": "File upload của người dùng sẽ được lưu tại ./songs/uploads/ với tên file duy nhất",
+    "example_path": "./songs/uploads/user_song_[timestamp].mp3",
+    "supported_formats": ["mp3", "mp4", "wav", "m4a", "webm"],
+    "max_size": "10MB"
+  }
+}

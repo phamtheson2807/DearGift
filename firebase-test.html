@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Firebase Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #000; color: white; }
+        button { background: #ff6b9d; color: white; border: none; padding: 10px 20px; margin: 5px; border-radius: 5px; cursor: pointer; }
+        .log { background: rgba(255,255,255,0.1); padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .success { color: #4CAF50; }
+        .error { color: #f44336; }
+    </style>
+</head>
+<body>
+    <h1>Firebase Connection Test</h1>
+    
+    <button onclick="testFirebaseConnection()">Test Firebase Connection</button>
+    <button onclick="testStorageUpload()">Test Storage Upload</button>
+    <button onclick="clearLogs()">Clear Logs</button>
+    
+    <div id="logs"></div>
+    <input type="file" id="testFile" accept="audio/*" style="margin: 10px 0;">
+
+    <!-- Firebase CDN -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+    
+    <!-- Firebase Music Uploader -->
+    <script src="firebase-music-uploader.js"></script>
+
+    <script>
+        // Firebase config
+        const firebaseConfig = {
+            apiKey: "AIzaSyDsQzklj9EplxSPFltI3kRVjzIu8DILwko",
+            authDomain: "deargift-f780b.firebaseapp.com",
+            projectId: "deargift-f780b",
+            storageBucket: "deargift-f780b.appspot.com",
+            messagingSenderId: "329430119253",
+            appId: "1:329430119253:web:71a099c215370092eeb5dc",
+            measurementId: "G-NSJHP66HKW"
+        };
+
+        // Initialize Firebase
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+            log('Firebase app initialized', 'success');
+        }
+
+        const db = firebase.firestore();
+        const storage = firebase.storage();
+
+        log('Firebase services created', 'success');
+
+        // Initialize music uploader
+        setTimeout(() => {
+            if (window.initializeFirebaseMusicUploader) {
+                window.initializeFirebaseMusicUploader();
+                log('Firebase Music Uploader initialized', 'success');
+            }
+        }, 1000);
+
+        function log(message, type = 'info') {
+            const logs = document.getElementById('logs');
+            const div = document.createElement('div');
+            div.className = `log ${type}`;
+            div.innerHTML = `[${new Date().toLocaleTimeString()}] ${message}`;
+            logs.appendChild(div);
+            console.log(message);
+        }
+
+        function clearLogs() {
+            document.getElementById('logs').innerHTML = '';
+        }
+
+        function testFirebaseConnection() {
+            log('Testing Firebase connection...');
+            
+            try {
+                // Test Firestore
+                db.collection('test').add({
+                    message: 'Firebase test',
+                    timestamp: new Date()
+                }).then(() => {
+                    log('✅ Firestore connection successful', 'success');
+                }).catch(error => {
+                    log(`❌ Firestore error: ${error.message}`, 'error');
+                });
+
+                // Test Storage
+                const testRef = storage.ref('test/test.txt');
+                const blob = new Blob(['Hello Firebase'], { type: 'text/plain' });
+                
+                testRef.put(blob).then(() => {
+                    log('✅ Storage upload successful', 'success');
+                    return testRef.delete();
+                }).then(() => {
+                    log('✅ Storage delete successful', 'success');
+                }).catch(error => {
+                    log(`❌ Storage error: ${error.message}`, 'error');
+                });
+
+            } catch (error) {
+                log(`❌ Firebase connection error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testStorageUpload() {
+            const fileInput = document.getElementById('testFile');
+            if (!fileInput.files[0]) {
+                log('❌ Please select a file first', 'error');
+                return;
+            }
+
+            const file = fileInput.files[0];
+            log(`Testing upload: ${file.name} (${(file.size/1024/1024).toFixed(2)}MB)`);
+
+            try {
+                if (!window.firebaseMusicUploader || !window.firebaseMusicUploader.isInitialized) {
+                    log('❌ Firebase Music Uploader not ready', 'error');
+                    return;
+                }
+
+                const result = await window.firebaseMusicUploader.uploadMusic(file, (progress) => {
+                    log(`Upload progress: ${progress.toFixed(1)}%`);
+                });
+
+                log(`✅ Upload successful: ${result.downloadURL}`, 'success');
+                
+            } catch (error) {
+                log(`❌ Upload error: ${error.message}`, 'error');
+            }
+        }
+    </script>
+</body>
+</html>

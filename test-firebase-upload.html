@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Firebase Music Upload</title>
+</head>
+<body>
+    <h1>Test Firebase Music Upload</h1>
+    <input type="file" id="musicFile" accept="audio/*">
+    <button onclick="testUpload()">Test Upload</button>
+    <div id="result"></div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+    
+    <script>
+        // Firebase config
+        const firebaseConfig = {
+            apiKey: "AIzaSyDsQzklj9EplxSPFltI3kRVjzIu8DILwko",
+            authDomain: "deargift-f780b.firebaseapp.com",
+            projectId: "deargift-f780b",
+            storageBucket: "deargift-f780b.appspot.com",
+            messagingSenderId: "649720828353",
+            appId: "1:649720828353:web:4c1c1c1c1c1c1c1c1c1c1c"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const storage = firebase.storage();
+
+        async function testUpload() {
+            const fileInput = document.getElementById('musicFile');
+            const resultDiv = document.getElementById('result');
+            
+            if (!fileInput.files[0]) {
+                resultDiv.innerHTML = 'Please select a file first';
+                return;
+            }
+
+            const file = fileInput.files[0];
+            resultDiv.innerHTML = 'Uploading...';
+
+            try {
+                // Generate unique filename
+                const timestamp = Date.now();
+                const randomId = Math.random().toString(36).substring(2, 15);
+                const fileExtension = file.name.split('.').pop();
+                const fileName = `music_${timestamp}_${randomId}.${fileExtension}`;
+                
+                // Upload to Firebase Storage
+                const storageRef = storage.ref(`music/${fileName}`);
+                const uploadTask = storageRef.put(file);
+
+                uploadTask.on('state_changed', 
+                    (snapshot) => {
+                        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                        resultDiv.innerHTML = `Uploading: ${progress.toFixed(1)}%`;
+                    },
+                    (error) => {
+                        console.error('Upload error:', error);
+                        resultDiv.innerHTML = `Error: ${error.message}`;
+                    },
+                    async () => {
+                        try {
+                            const downloadURL = await uploadTask.snapshot.ref.getDownloadURL();
+                            resultDiv.innerHTML = `
+                                <h3>Upload successful!</h3>
+                                <p><strong>Download URL:</strong></p>
+                                <p style="word-break: break-all; background: #f0f0f0; padding: 10px;">${downloadURL}</p>
+                                <p>Copy this URL and use it in your galaxy!</p>
+                            `;
+                            console.log('Firebase download URL:', downloadURL);
+                        } catch (error) {
+                            resultDiv.innerHTML = `Error getting download URL: ${error.message}`;
+                        }
+                    }
+                );
+
+            } catch (error) {
+                console.error('Upload error:', error);
+                resultDiv.innerHTML = `Error: ${error.message}`;
+            }
+        }
+    </script>
+</body>
+</html>

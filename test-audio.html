@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Audio - DearGift</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #1a1a2e;
+            color: white;
+        }
+        .test-item {
+            background: rgba(255,255,255,0.1);
+            margin: 20px 0;
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid #333;
+        }
+        audio {
+            width: 100%;
+            margin-top: 10px;
+        }
+        .status {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .success { background: rgba(0,255,0,0.2); border: 1px solid green; }
+        .error { background: rgba(255,0,0,0.2); border: 1px solid red; }
+        .info { background: rgba(0,100,255,0.2); border: 1px solid blue; }
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #45a049; }
+        .debug { font-family: monospace; font-size: 12px; }
+    </style>
+</head>
+<body>
+    <h1>🎵 Test Audio DearGift</h1>
+    <p>Kiểm tra các file nhạc có hoạt động không</p>
+
+    <div class="test-item">
+        <h3>1. File Local MP4 (Từ YouTube)</h3>
+        <p><strong>File:</strong> ./songs/anh_la_cua_em.mp4</p>
+        <audio controls preload="metadata" id="audio1">
+            <source src="./songs/anh_la_cua_em.mp4" type="video/mp4">
+            Browser không hỗ trợ audio MP4
+        </audio>
+        <div class="status info" id="status1">⏳ Chờ test...</div>
+        <button onclick="testAudio('audio1', 'status1', './songs/anh_la_cua_em.mp4')">Test Audio</button>
+    </div>
+
+    <div class="test-item">
+        <h3>2. File Local WebM (Alternative)</h3>
+        <p><strong>File:</strong> ./songs/yeu_la_tha_thu.webm</p>
+        <audio controls preload="metadata" id="audio2">
+            <source src="./songs/yeu_la_tha_thu.webm" type="audio/webm">
+            Browser không hỗ trợ audio WebM
+        </audio>
+        <div class="status info" id="status2">⏳ Chờ test...</div>
+        <button onclick="testAudio('audio2', 'status2', './songs/yeu_la_tha_thu.webm')">Test Audio</button>
+    </div>
+
+    <div class="test-item">
+        <h3>3. File Online MP3 (Free Music Archive)</h3>
+        <p><strong>URL:</strong> Kevin MacLeod - Sneaky Snitch</p>
+        <audio controls preload="metadata" id="audio3">
+            <source src="https://files.freemusicarchive.org/storage-freemusicarchive-org/music/no_curator/Kevin_MacLeod/Impact/Kevin_MacLeod_-_Sneaky_Snitch.mp3" type="audio/mpeg">
+            Browser không hỗ trợ audio MP3
+        </audio>
+        <div class="status info" id="status3">⏳ Chờ test...</div>
+        <button onclick="testAudio('audio3', 'status3', 'https://files.freemusicarchive.org/storage-freemusicarchive-org/music/no_curator/Kevin_MacLeod/Impact/Kevin_MacLeod_-_Sneaky_Snitch.mp3')">Test Audio</button>
+    </div>
+
+    <div class="test-item">
+        <h3>4. DearGift Galaxy Viewer Simulation</h3>
+        <p>Test giống như trong galaxy viewer</p>
+        <audio id="galaxyAudio" preload="metadata"></audio>
+        <div class="status info" id="status4">⏳ Chờ test...</div>
+        <button onclick="testGalaxyAudio()">Test Galaxy Audio</button>
+        <div id="audioControls"></div>
+    </div>
+
+    <div class="test-item">
+        <h3>📊 Debug Info</h3>
+        <div class="debug" id="debugInfo">
+            <strong>Browser Support:</strong><br>
+            MP3: <span id="mp3Support">❓</span><br>
+            MP4: <span id="mp4Support">❓</span><br>
+            WebM: <span id="webmSupport">❓</span><br>
+            <strong>Files Found:</strong><br>
+            <div id="filesFound">Checking...</div>
+        </div>
+    </div>
+
+    <script>
+        // Check browser audio support
+        function checkAudioSupport() {
+            const audio = new Audio();
+            document.getElementById('mp3Support').textContent = 
+                audio.canPlayType('audio/mpeg') ? '✅ Yes' : '❌ No';
+            document.getElementById('mp4Support').textContent = 
+                audio.canPlayType('video/mp4') ? '✅ Yes' : '❌ No';
+            document.getElementById('webmSupport').textContent = 
+                audio.canPlayType('audio/webm') ? '✅ Yes' : '❌ No';
+        }
+
+        // Test individual audio
+        function testAudio(audioId, statusId, src) {
+            const audio = document.getElementById(audioId);
+            const status = document.getElementById(statusId);
+            
+            status.className = 'status info';
+            status.innerHTML = '⏳ Đang test...';
+            
+            audio.addEventListener('loadstart', () => {
+                status.innerHTML = '🔄 Bắt đầu tải...';
+            });
+            
+            audio.addEventListener('canplay', () => {
+                status.className = 'status success';
+                status.innerHTML = '✅ Có thể phát! Duration: ' + audio.duration.toFixed(2) + 's';
+            });
+            
+            audio.addEventListener('error', (e) => {
+                status.className = 'status error';
+                status.innerHTML = '❌ Lỗi: ' + (e.message || 'Không thể tải file');
+                console.error('Audio error:', e);
+            });
+            
+            audio.src = src;
+            audio.load();
+        }
+
+        // Test galaxy audio (like in galaxy-viewer.js)
+        function testGalaxyAudio() {
+            const galaxyData = {
+                song: './songs/anh_la_cua_em.mp4'
+            };
+            
+            initializeAudio();
+            
+            function initializeAudio() {
+                const audio = document.getElementById('galaxyAudio');
+                const status = document.getElementById('status4');
+                
+                let audioSrc;
+                if (galaxyData.song.startsWith('http')) {
+                    audioSrc = galaxyData.song;
+                } else if (galaxyData.song.startsWith('./songs/')) {
+                    audioSrc = galaxyData.song;
+                } else if (galaxyData.song.startsWith('songs/')) {
+                    audioSrc = galaxyData.song;
+                } else {
+                    audioSrc = 'songs/' + galaxyData.song;
+                }
+                
+                console.log('Loading audio:', audioSrc);
+                
+                audio.src = audioSrc;
+                audio.loop = true;
+                audio.preload = 'metadata';
+                audio.volume = 0.5;
+                audio.muted = true;
+                audio.setAttribute('playsinline', '');
+                audio.setAttribute('webkit-playsinline', '');
+                
+                audio.load();
+                
+                audio.addEventListener('loadstart', function() {
+                    status.className = 'status info';
+                    status.innerHTML = '🔄 Galaxy audio loading...';
+                });
+                
+                audio.addEventListener('canplay', function() {
+                    status.className = 'status success';
+                    status.innerHTML = '✅ Galaxy audio ready! Click Play to test.';
+                    createAudioControls();
+                });
+                
+                audio.addEventListener('error', function(e) {
+                    status.className = 'status error';
+                    status.innerHTML = '❌ Galaxy audio error: ' + audioSrc;
+                    console.error('Audio error:', e);
+                    
+                    // Try WebM alternative
+                    if (audioSrc.endsWith('.mp4')) {
+                        const webmSrc = audioSrc.replace('.mp4', '.webm');
+                        status.innerHTML += '<br>🔄 Trying WebM: ' + webmSrc;
+                        audio.src = webmSrc;
+                        audio.load();
+                    }
+                });
+            }
+            
+            function createAudioControls() {
+                const audio = document.getElementById('galaxyAudio');
+                const container = document.getElementById('audioControls');
+                
+                container.innerHTML = '';
+                container.style.cssText = 'margin-top:10px;padding:10px;background:rgba(0,0,0,0.3);border-radius:5px;';
+                
+                const playBtn = document.createElement('button');
+                playBtn.textContent = 'Play';
+                playBtn.onclick = function() {
+                    if (audio.paused) {
+                        audio.muted = false;
+                        audio.play();
+                        playBtn.textContent = 'Pause';
+                    } else {
+                        audio.pause();
+                        playBtn.textContent = 'Play';
+                    }
+                };
+                
+                const volumeSlider = document.createElement('input');
+                volumeSlider.type = 'range';
+                volumeSlider.min = '0';
+                volumeSlider.max = '1';
+                volumeSlider.step = '0.1';
+                volumeSlider.value = audio.volume;
+                volumeSlider.onchange = function() {
+                    audio.volume = this.value;
+                };
+                
+                container.appendChild(playBtn);
+                container.appendChild(document.createTextNode(' Volume: '));
+                container.appendChild(volumeSlider);
+                
+                audio.addEventListener('play', () => playBtn.textContent = 'Pause');
+                audio.addEventListener('pause', () => playBtn.textContent = 'Play');
+            }
+        }
+
+        // Check what files exist
+        async function checkFiles() {
+            const files = [
+                './songs/anh_la_cua_em.mp4',
+                './songs/yeu_la_tha_thu.mp4', 
+                './songs/yeu_la_tha_thu.webm'
+            ];
+            
+            const filesDiv = document.getElementById('filesFound');
+            filesDiv.innerHTML = '';
+            
+            for (const file of files) {
+                try {
+                    const response = await fetch(file, { method: 'HEAD' });
+                    const status = response.ok ? '✅' : '❌';
+                    filesDiv.innerHTML += `${status} ${file}<br>`;
+                } catch (e) {
+                    filesDiv.innerHTML += `❌ ${file} (${e.message})<br>`;
+                }
+            }
+        }
+
+        // Initialize
+        checkAudioSupport();
+        checkFiles();
+    </script>
+</body>
+</html>
