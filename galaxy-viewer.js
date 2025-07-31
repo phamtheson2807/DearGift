@@ -14,7 +14,7 @@ var demoGalaxyDataDefault = {
     icons: ["♥", "💖", "❤️", "❤️", "💕", "💕"],
     colors: '#ff6b9d',
     images: [""],
-    song: "./songs/anh_la_cua_em.mp4", // Use local Vietnamese song
+    song: "./songs/anh_la_cua_em.webm", // Use WebM for better web compatibility
     isHeart: true,
     textHeart: "Yêu Em",
     isSave: true,
@@ -364,13 +364,15 @@ function initializeAudio() {
         return;
     }
     
-    // Sửa logic xử lý đường dẫn
+    // Sửa logic xử lý đường dẫn với format fallback
     var audioSrc;
+    var fallbackSrc;
     
     // Check if this is an uploaded file that won't exist on production
     if (galaxyData.song.includes('uploads/temp_') || galaxyData.song.includes('./songs/uploads/')) {
         console.log('Detected uploaded file, using fallback demo music:', galaxyData.song);
-        audioSrc = './songs/anh_la_cua_em.mp4'; // Use demo music
+        audioSrc = './songs/anh_la_cua_em.webm'; // Use WebM demo music
+        fallbackSrc = './songs/anh_la_cua_em.mp4'; // MP4 fallback
         
         // Show notification that we're using demo music
         setTimeout(function() {
@@ -390,31 +392,51 @@ function initializeAudio() {
     } else if (galaxyData.song.startsWith('./songs/')) {
         // Đã có tiền tố ./songs/
         audioSrc = galaxyData.song;
+        // Create fallback: if .webm, fallback to .mp4 and vice versa
+        if (audioSrc.endsWith('.webm')) {
+            fallbackSrc = audioSrc.replace('.webm', '.mp4');
+        } else if (audioSrc.endsWith('.mp4')) {
+            fallbackSrc = audioSrc.replace('.mp4', '.webm');
+        }
     } else if (galaxyData.song.startsWith('songs/')) {
         // Có tiền tố songs/
         audioSrc = galaxyData.song;
+        if (audioSrc.endsWith('.webm')) {
+            fallbackSrc = audioSrc.replace('.webm', '.mp4');
+        } else if (audioSrc.endsWith('.mp4')) {
+            fallbackSrc = audioSrc.replace('.mp4', '.webm');
+        }
     } else {
         // Chỉ có tên file
         audioSrc = 'songs/' + galaxyData.song;
     }
     
     console.log('Loading audio:', audioSrc);
+    if (fallbackSrc) console.log('Fallback audio:', fallbackSrc);
     
-    audio.src = audioSrc;
-    audio.loop = true;
-    audio.preload = 'metadata';
-    audio.volume = 0.5;
+    // Function to try loading audio
+    function tryLoadAudio(src, isRetry) {
+        audio.src = src;
+        audio.loop = true;
+        audio.preload = 'metadata';
+        audio.volume = 0.5;
+        
+        // Safari audio fix - muted autoplay
+        audio.muted = true;
+        audio.setAttribute('playsinline', '');
+        audio.setAttribute('webkit-playsinline', '');
+        
+        // Load audio
+        audio.load();
+        
+        if (!isRetry) {
+            // Always show music control button when audio is set
+            createAudioControls();
+        }
+    }
     
-    // Safari audio fix - muted autoplay
-    audio.muted = true;
-    audio.setAttribute('playsinline', '');
-    audio.setAttribute('webkit-playsinline', '');
-    
-    // Load audio
-    audio.load();
-    
-    // Always show music control button when audio is set
-    createAudioControls();
+    // Try primary audio source
+    tryLoadAudio(audioSrc, false);
     
     // Handle audio loading
     audio.addEventListener('loadstart', function() {
@@ -432,14 +454,19 @@ function initializeAudio() {
     
     audio.addEventListener('error', function(e) {
         console.error('Audio error:', e);
-        console.log('Failed to load:', audioSrc);
+        console.log('Failed to load:', audio.src);
         
-        // Check if it's an uploaded file that doesn't exist on server
-        if (audioSrc.includes('uploads/temp_') || audioSrc.includes('./songs/uploads/')) {
-            console.log('Uploaded file not found on server, falling back to demo music');
-            // Use demo music fallback
-            audio.src = './songs/anh_la_cua_em.mp4';
-            audio.load();
+        // Try fallback if available and not already tried
+        if (fallbackSrc && audio.src !== fallbackSrc) {
+            console.log('Trying fallback audio:', fallbackSrc);
+            tryLoadAudio(fallbackSrc, true);
+            return;
+        }
+        
+        // If fallback also fails or no fallback, try demo music
+        if (!audio.src.includes('anh_la_cua_em')) {
+            console.log('All sources failed, using demo music');
+            tryLoadAudio('./songs/anh_la_cua_em.webm', true);
             
             // Show notification
             setTimeout(function() {
@@ -451,20 +478,10 @@ function initializeAudio() {
                         musicText.style.fontSize = '12px';
                     }
                 }
-            }, 1000);
-            
-            return;
-        }
-        
-        // Try alternative formats
-        if (audioSrc.endsWith('.mp4')) {
-            var webmSrc = audioSrc.replace('.mp4', '.webm');
-            console.log('Trying WebM format:', webmSrc);
-            audio.src = webmSrc;
-            audio.load();
+            }, 2000);
         } else {
-            console.log('All audio formats failed, showing music selector');
-            createMusicSelector();
+            // Even demo music failed, show error state
+            createAudioControls(true);
         }
     });
     
