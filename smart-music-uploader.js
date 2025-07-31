@@ -26,12 +26,6 @@ class SmartMusicUploader {
             // Validate file first
             this.validateMusicFile(file);
             
-            // Temporarily disable Firebase Storage - use Blob URLs only for now
-            console.log('Using Blob URL for music upload (Firebase Storage temporarily disabled)...');
-            return await this.uploadAsBlob(file, progressCallback);
-            
-            // TODO: Re-enable Firebase Storage after CORS is fixed
-            /*
             // Always try Firebase Storage first for permanent links
             if (this.firebaseUploader && this.firebaseUploader.isInitialized) {
                 console.log('Uploading to Firebase Storage for permanent link...');
@@ -60,7 +54,6 @@ class SmartMusicUploader {
                 console.log('Firebase not available, using Blob URL...');
                 return await this.uploadAsBlob(file, progressCallback);
             }
-            */
         } catch (error) {
             console.error('Upload error:', error);
             throw error;
