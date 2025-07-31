@@ -42,7 +42,7 @@ class DropboxUploader {
             `client_id=${this.CLIENT_ID}&` +
             `redirect_uri=${encodeURIComponent(this.REDIRECT_URI)}&` +
             `response_type=token&` +
-            `scope=files.content.write files.content.read`;
+            `scope=files.content.write files.content.read sharing.write`;
         
         console.log('Redirecting to Dropbox authentication...');
         window.location.href = authUrl;
