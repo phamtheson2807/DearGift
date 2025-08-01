@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Galaxy Links - DearGift</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+        }
+        
+        .test-container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            backdrop-filter: blur(10px);
+        }
+        
+        .link-test {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            border-left: 4px solid #ff6b9d;
+        }
+        
+        .btn {
+            background: #ff6b9d;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+        
+        .btn:hover {
+            background: #ff5582;
+            transform: translateY(-2px);
+        }
+        
+        .current-url {
+            background: rgba(0, 255, 255, 0.2);
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            word-break: break-all;
+        }
+        
+        .status {
+            margin: 10px 0;
+            padding: 8px;
+            border-radius: 4px;
+        }
+        
+        .success { background: rgba(76, 175, 80, 0.3); }
+        .warning { background: rgba(255, 193, 7, 0.3); }
+        .error { background: rgba(244, 67, 54, 0.3); }
+    </style>
+</head>
+<body>
+    <h1>🔧 Test Galaxy Links</h1>
+    
+    <div class="test-container">
+        <h3>📊 Current Status</h3>
+        <div class="current-url">
+            <strong>Current URL:</strong> <span id="currentUrl"></span>
+        </div>
+        <div id="currentStatus" class="status"></div>
+    </div>
+
+    <div class="test-container">
+        <h3>🔗 Test Links</h3>
+        
+        <div class="link-test">
+            <h4>1. Galaxy Viewer Test (with ID)</h4>
+            <p>Test URL: <code>index.html?id=test123</code></p>
+            <a href="index.html?id=test123" class="btn" target="_blank">🚀 Test Galaxy Viewer</a>
+            <button class="btn" onclick="testUrl('index.html?id=test123')">🔍 Check URL</button>
+        </div>
+        
+        <div class="link-test">
+            <h4>2. Demo Mode Test</h4>
+            <p>Test URL: <code>index.html?demo=1</code></p>
+            <a href="index.html?demo=1" class="btn" target="_blank">🎨 Test Demo Mode</a>
+            <button class="btn" onclick="testUrl('index.html?demo=1')">🔍 Check URL</button>
+        </div>
+        
+        <div class="link-test">
+            <h4>3. Home Page Test</h4>
+            <p>Test URL: <code>home.html</code></p>
+            <a href="home.html" class="btn" target="_blank">🏠 Test Home Page</a>
+            <button class="btn" onclick="testUrl('home.html')">🔍 Check URL</button>
+        </div>
+        
+        <div class="link-test">
+            <h4>4. Creator Page Test</h4>
+            <p>Test URL: <code>creator.html</code></p>
+            <a href="creator.html" class="btn" target="_blank">✏️ Test Creator</a>
+            <button class="btn" onclick="testUrl('creator.html')">🔍 Check URL</button>
+        </div>
+        
+        <div class="link-test">
+            <h4>5. Real Galaxy Link Test</h4>
+            <p>Test URL: <code>index.html?id=mdsbnjpj2y6k9z</code> (từ ảnh của bạn)</p>
+            <a href="index.html?id=mdsbnjpj2y6k9z" class="btn" target="_blank">🌌 Test Real Galaxy</a>
+            <button class="btn" onclick="testUrl('index.html?id=mdsbnjpj2y6k9z')">🔍 Check URL</button>
+        </div>
+    </div>
+
+    <div class="test-container">
+        <h3>🛠️ Quick Actions</h3>
+        <button class="btn" onclick="clearCache()">🗑️ Clear Cache</button>
+        <button class="btn" onclick="reloadPage()">🔄 Reload Page</button>
+        <button class="btn" onclick="showConsole()">📋 Show Console</button>
+    </div>
+
+    <div class="test-container">
+        <h3>📋 Test Results</h3>
+        <div id="testResults"></div>
+    </div>
+
+    <script>
+        // Update current URL
+        document.getElementById('currentUrl').textContent = window.location.href;
+        
+        // Check current page status
+        function checkCurrentPageStatus() {
+            const currentUrl = window.location.href;
+            const statusDiv = document.getElementById('currentStatus');
+            
+            if (currentUrl.includes('test-galaxy-links.html')) {
+                statusDiv.className = 'status success';
+                statusDiv.innerHTML = '✅ Đang ở trang test - hoạt động bình thường';
+            } else if (currentUrl.includes('index.html')) {
+                if (currentUrl.includes('id=') || currentUrl.includes('demo=')) {
+                    statusDiv.className = 'status success';
+                    statusDiv.innerHTML = '✅ Đang ở Galaxy Viewer - đây là trang đúng!';
+                } else {
+                    statusDiv.className = 'status warning';
+                    statusDiv.innerHTML = '⚠️ Đang ở index.html nhưng không có tham số';
+                }
+            } else if (currentUrl.includes('home.html')) {
+                statusDiv.className = 'status warning';
+                statusDiv.innerHTML = '⚠️ Đang ở Home page - có thể bị redirect';
+            } else {
+                statusDiv.className = 'status error';
+                statusDiv.innerHTML = '❌ Không xác định được trang hiện tại';
+            }
+        }
+        
+        checkCurrentPageStatus();
+        
+        // Test URL function
+        async function testUrl(url) {
+            const resultsDiv = document.getElementById('testResults');
+            const testTime = new Date().toLocaleTimeString();
+            
+            try {
+                // Add to results
+                const resultHTML = `
+                    <div class="status warning">
+                        <strong>[${testTime}] Testing:</strong> ${url}<br>
+                        <small>⏳ Đang kiểm tra URL...</small>
+                    </div>
+                `;
+                resultsDiv.innerHTML = resultHTML + resultsDiv.innerHTML;
+                
+                // Try to fetch the URL
+                const response = await fetch(url, { method: 'HEAD' });
+                
+                let result;
+                if (response.ok) {
+                    result = `
+                        <div class="status success">
+                            <strong>[${testTime}] ✅ SUCCESS:</strong> ${url}<br>
+                            <small>Status: ${response.status} - URL có thể truy cập được</small>
+                        </div>
+                    `;
+                } else {
+                    result = `
+                        <div class="status error">
+                            <strong>[${testTime}] ❌ ERROR:</strong> ${url}<br>
+                            <small>Status: ${response.status} - URL không hoạt động</small>
+                        </div>
+                    `;
+                }
+                
+                resultsDiv.innerHTML = result + resultsDiv.innerHTML.replace(resultHTML, '');
+                
+            } catch (error) {
+                const result = `
+                    <div class="status error">
+                        <strong>[${testTime}] ❌ FETCH ERROR:</strong> ${url}<br>
+                        <small>Error: ${error.message}</small>
+                    </div>
+                `;
+                resultsDiv.innerHTML = result + resultsDiv.innerHTML.replace(resultHTML, '');
+            }
+        }
+        
+        // Clear cache
+        function clearCache() {
+            if ('caches' in window) {
+                caches.keys().then(function(names) {
+                    for (let name of names) {
+                        caches.delete(name);
+                    }
+                });
+            }
+            
+            // Clear localStorage
+            localStorage.clear();
+            sessionStorage.clear();
+            
+            alert('✅ Cache đã được xóa! Hãy reload trang.');
+        }
+        
+        // Reload page
+        function reloadPage() {
+            window.location.reload(true);
+        }
+        
+        // Show console info
+        function showConsole() {
+            console.log('=== DEARGIFT DEBUG INFO ===');
+            console.log('Current URL:', window.location.href);
+            console.log('User Agent:', navigator.userAgent);
+            console.log('LocalStorage galaxies:', localStorage.getItem('deargift_galaxies'));
+            console.log('Available scripts:', Array.from(document.scripts).map(s => s.src));
+            
+            alert('📋 Debug info đã được ghi vào Console (F12)');
+        }
+        
+        // Auto-test important URLs
+        setTimeout(() => {
+            console.log('Running auto-tests...');
+            testUrl('index.html?demo=1');
+        }, 1000);
+    </script>
+</body>
+</html>

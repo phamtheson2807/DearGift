@@ -5,7 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DearGift Creator - Tạo Galaxy của bạn</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
-    <link rel="icon" type="image/png" href="./logo.png">
+    <!-- Firebase SDK v8 -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+
     
     <style>
         * {
@@ -517,6 +521,49 @@
                     <div class="preview-images" id="previewImages"></div>
                 </div>
 
+                <!-- Âm thanh/Nhạc nền -->
+                <div class="form-group">
+                    <label>🎵 Âm thanh/Nhạc nền</label>
+                    
+                    <!-- Music Tabs -->
+                    <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                        <button type="button" class="tab-btn active" id="presetTab" onclick="showMusicTab('preset')">
+                            🎶 Nhạc có sẵn
+                        </button>
+                        <button type="button" class="tab-btn" id="uploadTab" onclick="showMusicTab('upload')">
+                            📤 Upload nhạc
+                        </button>
+                    </div>
+
+                    <!-- Preset Music Content -->
+                    <div id="presetMusic" style="display: block;">
+                        <div style="margin-bottom: 10px;">
+                            <select class="form-control" id="musicCategory" onchange="loadSongsByCategory()" style="margin-bottom: 10px;">
+                                <option value="">Chọn thể loại nhạc</option>
+                                <option value="love">💕 Nhạc tình yêu</option>
+                                <option value="birthday">🎂 Sinh nhật</option>
+                                <option value="instrumental">🎼 Nhạc không lời</option>
+                            </select>
+                        </div>
+                        
+                        <div id="songList" style="display: none;">
+                            <div class="songs-container"></div>
+                        </div>
+                    </div>
+
+                    <!-- Upload Music Content -->
+                    <div id="uploadMusic" style="display: none;">
+                        <div class="file-input-container">
+                            <label for="musicFile" class="file-input-label">
+                                🎵 Chọn file nhạc hoặc kéo thả vào đây
+                                <br><small style="opacity: 0.7;">Hỗ trợ: MP3, MP4, WAV, WebM (tối đa 100MB)</small>
+                            </label>
+                            <input type="file" id="musicFile" class="file-input" accept="audio/*,video/mp4,video/webm" onchange="handleEnhancedMusicUpload(event)">
+                        </div>
+                        <!-- Upload status will be added dynamically -->
+                    </div>
+                </div>
+
                 <!-- Tên hiển thị trên trái tim -->
                 <div class="form-group">
                     <label for="heartText">💝 Tên hiển thị trên trái tim</label>
@@ -546,7 +593,7 @@
                     <button type="button" class="btn btn-preview" id="viewDemoBtn" style="flex: 1; min-width: 200px; background: rgba(255, 107, 157, 0.2); border: 2px solid #ff6b9d;">
                         👁️ Xem trước Demo
                     </button>
-                    <button type="submit" class="btn" style="flex: 1; min-width: 200px;">
+                    <button type="button" id="createGalaxyBtn" class="btn" style="flex: 1; min-width: 200px;">
                         🚀 Tạo Galaxy của tôi
                     </button>
                 </div>
@@ -820,6 +867,53 @@
             });
         };
     </script>
+    
+    <!-- Script kiểm tra lỗi -->
+    <script>
+      // Thêm biến global cho presets
+      window.uploadedMusicFile = null;
+      window.selectedSong = null;
+      window.audioEnabled = true; // Auto enable for better UX
+      
+      // Ngăn chặn reload form khi submit
+      window.addEventListener('DOMContentLoaded', function() {
+        console.log("DOM fully loaded");
+        
+        // Đăng ký xử lý form
+        const form = document.getElementById('galaxyForm');
+        if (form) {
+          console.log("Adding prevent default to form");
+          form.onsubmit = function(e) {
+            console.log("Form submit detected - preventing default behavior");
+            e.preventDefault();
+            return false;
+          }
+        }
+        
+        // Đăng ký sự kiện cho nút tạo
+        const createBtn = document.getElementById('createGalaxyBtn');
+        if (createBtn) {
+          console.log("Registering click handler for create button");
+          createBtn.onclick = function(e) {
+            console.log("Create button clicked");
+            if (typeof handleFormSubmit === 'function') {
+              handleFormSubmit(e);
+            } else {
+              console.error("handleFormSubmit function not found!");
+              alert("Lỗi: Không tìm thấy hàm xử lý. Vui lòng tải lại trang.");
+            }
+          };
+        } else {
+          console.error("Create button not found!");
+        }
+        
+        // Test console
+        console.log("Script initialization complete");
+      });
+    </script>
+    
+    <!-- Clipboard Helper for safe copy operations -->
+    <script src="clipboard-helper.js"></script>
     
     <!-- Main Creator Script -->
     <script src="creator.js"></script>

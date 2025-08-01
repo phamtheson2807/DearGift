@@ -4,6 +4,22 @@
 [build.environment]
   NODE_VERSION = "18"
 
+# Redirects (đảm bảo index.html không bị redirect)
+[[redirects]]
+  from = "/"
+  to = "/home.html"
+  status = 200
+
+[[redirects]]
+  from = "/index.html"
+  to = "/index.html"
+  status = 200
+  
+[[redirects]]
+  from = "/index.html/*"
+  to = "/index.html/:splat"
+  status = 200
+
 [[headers]]
   for = "/*"
   [headers.values]
@@ -25,3 +41,9 @@
   for = "*.html"
   [headers.values]
     Cache-Control = "public, max-age=300"
+
+# Đặc biệt cho index.html - cache ngắn hơn để test
+[[headers]]
+  for = "/index.html"
+  [headers.values]
+    Cache-Control = "public, max-age=60"

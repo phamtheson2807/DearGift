@@ -1,0 +1,36 @@
+<!-- HTML snippet để thêm vào creator.html trước đóng body tag -->
+<!-- Thêm API Client mới -->
+<script src="deargift-api.js"></script>
+
+<!-- Thêm code khởi tạo API -->
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM fully loaded');
+    
+    // Khởi tạo API client nếu chưa có
+    if (window.dearGiftAPI && !window.dearGiftAPI.isInitialized) {
+      window.dearGiftAPI.init()
+        .then(result => {
+          console.log('Backend API initialization:', result ? 'Success' : 'Failed');
+          if (result) {
+            // Tải danh sách bài hát từ API
+            window.dearGiftAPI.getAvailableSongs()
+              .then(songs => {
+                if (songs && Object.keys(songs).length > 0) {
+                  window.availableSongs = songs;
+                  console.log('Songs loaded from API:', Object.keys(songs));
+                  
+                  // Cập nhật UI nếu cần
+                  if (typeof loadAvailableSongs === 'function') {
+                    loadAvailableSongs();
+                  }
+                }
+              })
+              .catch(err => console.warn('Could not load songs from API:', err));
+          }
+        });
+    }
+    
+    console.log('Script initialization complete');
+  });
+</script>
